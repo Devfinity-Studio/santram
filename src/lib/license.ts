@@ -22,7 +22,7 @@ const DEFAULT_LICENSE: LicenseConfig = {
 	organization: "Santram Pharma Pvt. Ltd.",
 	developerEmail: process.env.DEV_EMAIL || "info@devfinity.net",
 	supportEmail: "support@devfinity.net",
-	adminEmails: [process.env.ADMIN_EMAIL || "Santrampharma2022@gmail.com"],
+	adminEmails: [process.env.ADMIN_EMAIL || "santrampharma2022@gmail.com"],
 	updatedAt: new Date().toISOString(),
 	updatedBy: "system",
 };
@@ -36,11 +36,11 @@ export async function getLicenseConfig(): Promise<LicenseConfig> {
 	const config: LicenseConfig = { ...DEFAULT_LICENSE, ...data };
 
 	// Sanitize adminEmails: replace dummy admin@admin.com with admin email from env
-	const defaultAdminEmail = process.env.ADMIN_EMAIL || "Santrampharma2022@gmail.com";
+	const defaultAdminEmail = process.env.ADMIN_EMAIL || "santrampharma2022@gmail.com";
 	if (
 		!config.adminEmails ||
 		config.adminEmails.length === 0 ||
-		(config.adminEmails.length === 1 && (config.adminEmails[0] === "admin@admin.com" || config.adminEmails[0] === "dev@Santrampharma.com"))
+		(config.adminEmails.length === 1 && (config.adminEmails[0] === "admin@admin.com" || config.adminEmails[0] === "dev@santrampharma.com"))
 	) {
 		config.adminEmails = [defaultAdminEmail];
 	}
@@ -188,7 +188,7 @@ export async function sendSubscriptionReminderEmails(
 	senderGateway: "DEVELOPER" | "ADMIN" = "DEVELOPER",
 ) {
 	const status = await getLicenseStatus();
-	const defaultAdminEmail = process.env.ADMIN_EMAIL || (status.adminEmails && status.adminEmails[0]) || "Santrampharma2022@gmail.com";
+	const defaultAdminEmail = process.env.ADMIN_EMAIL || (status.adminEmails && status.adminEmails[0]) || "santrampharma2022@gmail.com";
 	const devEmail = status.developerEmail || process.env.DEV_EMAIL || "info@devfinity.net";
 
 	// Determine recipients:

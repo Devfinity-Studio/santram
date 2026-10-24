@@ -11,7 +11,7 @@ Instead of requiring manual Admin assignments or restricting MRs to a single row
 
 ### 1. Database Scanning & Profile Consolidation Engine (`src/server/actions/mrInfo.ts`)
 - Implemented `consolidateMRProfiles(rawList, allOverrides)`:
-  - **Priority 1 (Email)**: Matches records sharing the same valid, non-synthetic `EmailId` (excluding `@Santrampharma.com` placeholders).
+  - **Priority 1 (Email)**: Matches records sharing the same valid, non-synthetic `EmailId` (excluding `@santrampharma.com` placeholders).
   - **Priority 2 (Name)**: Matches remaining records by case-insensitive, trimmed `MRName`.
   - Merges all linked database IDs into `allIds: string[]` and all distinct divisions/companies into `assignments: MRAssignment[]`.
 - Updated `getMRInfo(identifier)`:

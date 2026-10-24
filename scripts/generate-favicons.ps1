@@ -124,7 +124,6 @@ function GenerateIcoFile($outputPath, $source) {
 GenerateIcoFile "public/favicons/favicon.ico" $sourceImg
 GenerateIcoFile "public/icons/favicon.ico" $sourceImg
 GenerateIcoFile "public/favicon.ico" $sourceImg
-GenerateIcoFile "src/app/favicon.ico" $sourceImg
 
 $sourceImg.Dispose()
 Write-Host "All favicons generated successfully from logo.png!"

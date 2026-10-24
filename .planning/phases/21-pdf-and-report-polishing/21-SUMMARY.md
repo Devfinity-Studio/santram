@@ -4,7 +4,7 @@
 
 ### 1. Unified Stationery Header (Web View)
 - Built `ReportStationeryHeader` in `src/components/report-stationery-header.tsx` matching the reference official company layout:
-  - Official company name: `Santram PHARMA PRIVATE LIMITED`
+  - Official company name: `SANTRAM PHARMA PRIVATE LIMITED`
   - Registered office address and contact/email details.
   - Distinct divider bar with `Year: 2026-27`, dynamic centered report title with period dates (`{Title} for Period of {fromDisplay} to {toDisplay}`), and customizable summary badge on the right.
 - Integrated across all 6 report views:

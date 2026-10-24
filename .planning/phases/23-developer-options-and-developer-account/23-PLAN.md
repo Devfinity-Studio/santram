@@ -29,7 +29,7 @@ Implement an enterprise-grade Developer Control Center and full-fledged Develope
     - `killswitchActive`: boolean
     - `gracePeriodDays`: number (default 7 days)
     - `organization`: "Santram Pharma Pvt. Ltd."
-    - `developerEmail`: "dev@Santrampharma.com"
+    - `developerEmail`: "dev@santrampharma.com"
     - `supportEmail`: "support@devfinity.net"
   - Functions:
     - `getLicenseStatus()`: Computes status, days remaining, and whether access is blocked.

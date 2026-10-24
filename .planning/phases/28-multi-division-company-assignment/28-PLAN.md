@@ -58,7 +58,7 @@ flowchart TD
     ```
   - Implement a centralized consolidation helper:
     `consolidateMRs(rawList: LegacyMRUser[]): MRDisplayItem[]`
-    - Groups rows where `MRName` matches (case-insensitive) OR valid `EmailId` matches (excluding `@Santrampharma.com`).
+    - Groups rows where `MRName` matches (case-insensitive) OR valid `EmailId` matches (excluding `@santrampharma.com`).
     - Collects all unique divisions and companies into `assignments`.
     - Merges company names and company codes.
   - Update `getMRInfo(identifier)`:

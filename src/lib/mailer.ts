@@ -24,7 +24,7 @@ export function isDeveloperMailerConfigured(): boolean {
  * Get active developer sender email address.
  */
 export function getDeveloperSenderEmail(): string {
-	return process.env.DEV_EMAIL || process.env.DEV_SMTP_USER || "dev@Santrampharma.com";
+	return process.env.DEV_EMAIL || process.env.DEV_SMTP_USER || "dev@santrampharma.com";
 }
 
 /**

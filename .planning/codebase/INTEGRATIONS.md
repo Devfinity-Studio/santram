@@ -87,12 +87,12 @@ The Next.js application acts as a Backend-For-Frontend (BFF), communicating with
 
 | Variable | Required | Default | Purpose |
 |---|---|---|---|
-| `API_SERVER_URL` | No | `https://api.Santrampharma.com` | Base URL of the `api-server` microservice |
+| `API_SERVER_URL` | No | `https://api.santrampharma.com` | Base URL of the `api-server` microservice |
 | `API_SECRET_KEY` | Yes (Min 16 chars) | - | Shared secret Bearer token used to authenticate requests to `api-server` |
 | `BETTER_AUTH_SECRET` | Yes | - | Cryptographic HMAC secret used by `jose` to sign stateless session JWTs |
 | `GMAIL_USER` | Optional | - | Sender Gmail address for OTP and alerts |
 | `GMAIL_PASS` | Optional | - | 16-character Gmail App Password |
-| `ADMIN_EMAIL` | Optional | `Santrampharma2022@gmail.com` | Primary administrator login email |
+| `ADMIN_EMAIL` | Optional | `santrampharma2022@gmail.com` | Primary administrator login email |
 | `ADMIN_PASSWORD` | Optional | - | Primary administrator password |
 | `DEV_EMAIL` | Optional | `info@devfinity.net` | Developer super-admin account email |
 | `DEV_PASSWORD` | Optional | - | Developer super-admin account password |
