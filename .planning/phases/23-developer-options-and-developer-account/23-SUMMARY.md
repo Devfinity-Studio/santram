@@ -25,7 +25,7 @@ Phase 23 delivers a comprehensive, enterprise-grade **Developer Control Center**
   - Tracks subscription expiry, countdown days, grace periods, and license status (`ACTIVE`, `EXPIRED`, `SUSPENDED`).
   - **Emergency Killswitch**: Instantly freezes platform access with 1 click.
   - **Branded Lockout Screen** (`src/app/license-expired/page.tsx`): Displays company details, renewal contacts (`support@devfinity.net`), and developer bypass access. Standard Admins and MRs are locked out upon expiration or killswitch activation. Developers retain full access to `/admin/dev` to unfreeze or renew.
-  - **Automated Renewal Mailers**: Dispatches official HTML renewal notices and payment reminders from the Developer email (`dev@Santrampharma.com`) to all registered Administrator emails via Gmail SMTP.
+  - **Automated Renewal Mailers**: Dispatches official HTML renewal notices and payment reminders from the Developer email (`dev@santrampharma.com`) to all registered Administrator emails via Gmail SMTP.
 
 ### C. Granular Feature Switchboard & Global Maintenance Mode
 - **Feature Switchboard** (`src/lib/maintenance.ts` & `data/feature_toggles.json`):

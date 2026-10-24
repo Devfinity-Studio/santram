@@ -49,7 +49,7 @@ Consequently, MySQL rejected all procedure executions with HTTP 500: `"Incorrect
 
 ## 3. Server Deployment Requirement
 
-Because the API server (`api.Santrampharma.com`) is hosted on the client's on-premises/VPS server (`157.20.190.91`), the updated commit `890da92` must be pulled and rebuilt on the host machine:
+Because the API server (`api.santrampharma.com`) is hosted on the client's on-premises/VPS server (`157.20.190.91`), the updated commit `890da92` must be pulled and rebuilt on the host machine:
 ```bash
 git pull origin master
 pnpm build

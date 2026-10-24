@@ -15,7 +15,7 @@ This phase implements automated scanning across all duplicate MR records in the 
 - **Automatic Matching Criteria**:
   - Two or more records in `pdyspvmaster.l_mktcompany_mr` represent the same MR if:
     1. They share the same `MRName` (case-insensitive, trimmed), OR
-    2. They share the same non-placeholder `EmailId` (case-insensitive, trimmed, excluding `@Santrampharma.com` synthetic emails).
+    2. They share the same non-placeholder `EmailId` (case-insensitive, trimmed, excluding `@santrampharma.com` synthetic emails).
 - **Aggregated Profile**:
   - Primary identity: Uses the primary row ID, name, email, mobile, and rank.
   - `assignments` / `divisions`: An array containing all distinct divisions and companies associated with the MR across all matching database rows:

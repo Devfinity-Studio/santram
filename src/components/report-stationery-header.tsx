@@ -34,14 +34,13 @@ export function ReportStationeryHeader({
 					</div>
 					<div>
 						<h1 className="font-extrabold text-base text-gray-900 uppercase tracking-tight">
-							Santram PHARMA PRIVATE LIMITED
+							SANTRAM PHARMA PRIVATE LIMITED
 						</h1>
-						<p className="mt-0.5 text-[11px] text-gray-700 leading-tight">
-							BASEMENT-GF, 11/2 ASHOK HOUSE, B/S SANSTHA VASAHAT GATE,, PRATAP ROAD,
+						<p className="mt-0.5 text-[14px] text-gray-700 leading-tight">
+							PATEL  PEN LANE, SHIYAPURA, RAOPURA
 							<br />
 							RAOPURA, VADODARA - 390001, GUJARAT - 24
 							<br />
-							Contact: 9409789800, 9409789700 Mobile: 9409789700 Email: Santrampharma2022@gmail.com
 						</p>
 					</div>
 				</div>

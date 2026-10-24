@@ -13,7 +13,7 @@ export const env = createEnv({
 		API_SERVER_URL: z
 			.string()
 			.optional()
-			.default("https://api.Santrampharma.com"),
+			.default("https://api.santrampharma.com"),
 		API_SECRET_KEY: z.string().min(16).optional(),
 		NODE_ENV: z
 			.enum(["development", "test", "production"])

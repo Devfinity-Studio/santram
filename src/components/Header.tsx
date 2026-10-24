@@ -24,7 +24,7 @@ export default async function Header() {
 					/>
 					<div className="flex flex-col">
 						<span className="font-extrabold text-slate-900 text-lg tracking-wider leading-tight">
-							Santram <span className="text-cyan-600">PHARMA</span>
+							SANTRAM <span className="text-cyan-600">PHARMA</span>
 						</span>
 						<span className="font-semibold text-[10px] text-cyan-700 tracking-widest uppercase">
 							LOGISTICS PORTAL

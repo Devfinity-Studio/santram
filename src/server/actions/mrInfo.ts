@@ -80,7 +80,7 @@ export interface MRDisplayItem {
 function isSyntheticEmail(email?: string | null): boolean {
 	if (!email) return true;
 	const clean = email.trim().toLowerCase();
-	return clean === "" || clean.includes("@Santrampharma.com");
+	return clean === "" || clean.includes("@santrampharma.com");
 }
 
 /**

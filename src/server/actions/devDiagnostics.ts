@@ -3,7 +3,6 @@
 import fs from "fs/promises";
 import path from "path";
 import { headers } from "next/headers";
-import { revalidatePath } from "next/cache";
 import {
 	getServerDataFilePath,
 	getServerDataDir,
@@ -41,6 +40,8 @@ import {
 	type RuntimeConfig,
 } from "@/lib/runtime-config";
 import { auth } from "@/server/auth";
+import type { ServiceHealthReport, UnifiedLogRecord } from "@/types/diagnostics";
+
 
 /**
  * Validates that the active session belongs to a DEVELOPER.
@@ -66,7 +67,7 @@ async function assertDeveloperSession(customHeaders?: Headers) {
 				user: {
 					id: "dev-local",
 					name: "Local Developer",
-					email: "dev@Santrampharma.com",
+					email: "dev@santrampharma.com",
 					role: "DEVELOPER" as const,
 				},
 				session: {
@@ -81,40 +82,7 @@ async function assertDeveloperSession(customHeaders?: Headers) {
 	return session;
 }
 
-export interface ServiceHealthReport {
-	overallStatus: "HEALTHY" | "DEGRADED" | "DOWN";
-	timestamp: string;
-	frontend: {
-		status: "HEALTHY" | "DEGRADED" | "DOWN";
-		uptimeSeconds: number;
-		memoryRssMb: number;
-		heapUsedMb: number;
-		heapTotalMb: number;
-		nodeVersion: string;
-		platform: string;
-		pid: number;
-	};
-	apiServer: {
-		status: "HEALTHY" | "DEGRADED" | "DOWN";
-		latencyMs: number;
-		endpoint: string;
-		error?: string;
-	};
-	database: {
-		status: "HEALTHY" | "DEGRADED" | "DOWN";
-		latencyMs: number;
-		error?: string;
-	};
-	mailer: {
-		status: "HEALTHY" | "DEGRADED" | "DOWN";
-		user: string;
-		error?: string;
-	};
-	storage: {
-		status: "HEALTHY" | "DEGRADED" | "DOWN";
-		writeLatencyMs: number;
-	};
-}
+
 
 /**
  * 1. Multi-Service Health & Telemetry Check
@@ -228,16 +196,7 @@ export async function getServiceHealthTelemetry(): Promise<ServiceHealthReport> 
 	};
 }
 
-export interface UnifiedLogRecord {
-	id: string;
-	timestamp: string;
-	source: "USER_ACTIVITY" | "SYSTEM_EVENT";
-	level: "INFO" | "WARN" | "ERROR";
-	event: string;
-	ip: string;
-	user?: string | null;
-	details?: Record<string, any>;
-}
+
 
 /**
  * 2. Unified Log Stream (User Audit + System Diagnostics)
@@ -309,15 +268,15 @@ function buildFallbackProcedureSql(procedureName: string, params: Record<string,
 	const escapedLoc = `'${locParam.replace(/'/g, "''")}'`;
 
 	if (procedureName === "rptStockMovementStatement") {
-		return `SET sql_mode = '';\nCALL \`pdyspvtrans\`.\`rptStockMovementStatement\`(${params.compNo ?? 11}, ${escapedLoc}, 202627, {d '2026-04-01'}, ${odbcFrom}, ${odbcTo}, ${compParam}, '', '', 'PRate');`;
+		return `SET sql_mode = '';\nCALL \`pdyspvtrans\`.\`rptStockMovementStatement\`(${params.compNo ?? 12}, ${escapedLoc}, 202627, {d '2026-04-01'}, ${odbcFrom}, ${odbcTo}, ${compParam}, '', '', 'PRate');`;
 	} else if (procedureName === "rptStockandSalesStatementReport") {
-		return `SET sql_mode = '';\nCALL \`pdyspvtrans\`.\`rptStockandSalesStatementReport\`(${params.compNo ?? 11}, ${escapedLoc}, ${odbcFrom}, ${odbcTo}, ${compParam}, '', '', '', 'N', 'Y');`;
+		return `SET sql_mode = '';\nCALL \`pdyspvtrans\`.\`rptStockandSalesStatementReport\`(${params.compNo ?? 12}, ${escapedLoc}, ${odbcFrom}, ${odbcTo}, ${compParam}, '', '', '', 'N', 'Y');`;
 	} else if (procedureName === "rptItemCustomerSale") {
-		return `SET sql_mode = '';\nCALL \`pdyspvtrans\`.\`rptItemCustomerSale\`(${odbcFrom}, ${odbcTo}, ${params.compNo ?? 11}, ${escapedLoc}, 202627, '', '', '', ${compParam}, '', 'Y', '', '', ${escapedLoc}, 'SalesEntry', '');`;
+		return `SET sql_mode = '';\nCALL \`pdyspvtrans\`.\`rptItemCustomerSale\`(${odbcFrom}, ${odbcTo}, ${params.compNo ?? 12}, ${escapedLoc}, 202627, '', '', '', ${compParam}, '', 'Y', '', '', ${escapedLoc}, 'SalesEntry', '');`;
 	} else if (procedureName === "rptMRwisePeriodicalOutstanding") {
-		return `SET sql_mode = '';\nCALL \`pdyspvtrans\`.\`rptMRwisePeriodicalOutstanding\`(${params.compNo ?? 11}, ${Number(params.locNo) || 11}, 202627, {d '2026-04-01'}, ${odbcFrom}, ${odbcTo}, '', '', 'All', '', '', ${compParam}, '', '', '');`;
+		return `SET sql_mode = '';\nCALL \`pdyspvtrans\`.\`rptMRwisePeriodicalOutstanding\`(${params.compNo ?? 12}, ${Number(params.locNo) || 11}, 202627, {d '2026-04-01'}, ${odbcFrom}, ${odbcTo}, '', '', 'All', '', '', ${compParam}, '', '', '');`;
 	} else if (procedureName === "rptCompanyCustomerItemwiseSales") {
-		return `SET sql_mode = '';\nCALL \`pdyspvtrans\`.\`rptCompanyCustomerItemwiseSales\`(${params.compNo ?? 11}, ${escapedLoc}, 202627, ${odbcFrom}, ${odbcTo}, '', ${compParam}, '', '', 'Y', '');`;
+		return `SET sql_mode = '';\nCALL \`pdyspvtrans\`.\`rptCompanyCustomerItemwiseSales\`(${params.compNo ?? 12}, ${escapedLoc}, 202627, ${odbcFrom}, ${odbcTo}, '', ${compParam}, '', '', 'Y', '');`;
 	}
 	return `SET sql_mode = '';\nCALL \`${procedureName}\`(...);`;
 }
@@ -363,7 +322,7 @@ export async function executeProcedureSandbox(payload: {
 			fromDate: p.fromDate,
 			toDate: p.toDate,
 			locNo: p.locNo || "11",
-			compNo: p.compNo ?? 11,
+			compNo: p.compNo ?? 12,
 		};
 
 		let liveRes: any = null;
@@ -621,17 +580,6 @@ export async function saveFeatureToggleAction(key: FeatureKey, scope: FeatureSco
 export async function saveMaintenanceConfigAction(update: Partial<MaintenanceConfig>) {
 	const session = await assertDeveloperSession();
 	const result = await updateMaintenanceConfig(update, session.user.email);
-
-	try {
-		revalidatePath("/", "layout");
-		revalidatePath("/login");
-		revalidatePath("/dashboard");
-		revalidatePath("/admin/dashboard");
-		revalidatePath("/admin/dev");
-	} catch {
-		// Ignore revalidation errors outside request context
-	}
-
 	await recordAuditEvent({
 		event: "SECURITY_WARNING",
 		userId: session.user.id,
