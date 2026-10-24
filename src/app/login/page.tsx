@@ -30,7 +30,7 @@ export default async function LoginPage() {
 				{/* Simple Text Branding */}
 				<div className="mb-4 flex justify-center">
 					<Image
-						alt="Asmee Pharma Logo"
+						alt="Santram Pharma Logo"
 						className="object-contain"
 						height={60}
 						priority

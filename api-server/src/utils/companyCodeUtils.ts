@@ -20,7 +20,7 @@ export async function getMarketingCompanyCodeMap(
   const map = new Map<string, string>();
   try {
     const [rows]: any = await db.query(
-      "SELECT Code, Description FROM `pdyasvmaster`.`m_mktcompany`"
+      "SELECT Code, Description FROM `pdyspvmaster`.`m_mktcompany`"
     );
     if (Array.isArray(rows)) {
       for (const row of rows) {

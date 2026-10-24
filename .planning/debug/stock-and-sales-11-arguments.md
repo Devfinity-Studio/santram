@@ -3,7 +3,7 @@
 **Status:** Resolved  
 **Date:** 2026-10-23  
 **Symptom:**  
-`Failed to load Stock & Sales report: API Server HTTP 500: {"success":false,"error":"Incorrect number of arguments for PROCEDURE pdyasvtrans.rptStockandSalesStatementReport; expected 11, got 10"}`
+`Failed to load Stock & Sales report: API Server HTTP 500: {"success":false,"error":"Incorrect number of arguments for PROCEDURE pdyspvtrans.rptStockandSalesStatementReport; expected 11, got 10"}`
 
 ---
 
@@ -15,8 +15,8 @@ During this refactor:
 1. The 8th parameter `finYear` (defaults to `202627`) was inadvertently removed from the `formattedParams` array in both:
    - `POST /api/reports/stock-and-sales` (line 107)
    - `POST /api/reports/dev-procedure-sandbox` (line 630)
-2. This reduced the total number of arguments passed in `CALL \`pdyasvtrans\`.\`rptStockandSalesStatementReport\`(...)` from **11** to **10**.
-3. The underlying MySQL stored procedure `pdyasvtrans.rptStockandSalesStatementReport` expects exactly 11 arguments:
+2. This reduced the total number of arguments passed in `CALL \`pdyspvtrans\`.\`rptStockandSalesStatementReport\`(...)` from **11** to **10**.
+3. The underlying MySQL stored procedure `pdyspvtrans.rptStockandSalesStatementReport` expects exactly 11 arguments:
    1. `p_CmpNo` (INT) — e.g. `11`
    2. `p_LocNo` (mediumtext) — e.g. `'(''11'')'`
    3. `p_FromDt` — e.g. `{d '2026-10-01'}`
@@ -29,7 +29,7 @@ During this refactor:
    10. `p_ItemCategory` (longtext) — e.g. `''`
    11. `p_ShowFree` (varchar) — e.g. `'Y'`
 
-Consequently, MySQL rejected all procedure executions with HTTP 500: `"Incorrect number of arguments for PROCEDURE pdyasvtrans.rptStockandSalesStatementReport; expected 11, got 10"`.
+Consequently, MySQL rejected all procedure executions with HTTP 500: `"Incorrect number of arguments for PROCEDURE pdyspvtrans.rptStockandSalesStatementReport; expected 11, got 10"`.
 
 ---
 
@@ -49,7 +49,7 @@ Consequently, MySQL rejected all procedure executions with HTTP 500: `"Incorrect
 
 ## 3. Server Deployment Requirement
 
-Because the API server (`api.asmeepharma.com`) is hosted on the client's on-premises/VPS server (`157.20.190.91`), the updated commit `890da92` must be pulled and rebuilt on the host machine:
+Because the API server (`api.santrampharma.com`) is hosted on the client's on-premises/VPS server (`157.20.190.91`), the updated commit `890da92` must be pulled and rebuilt on the host machine:
 ```bash
 git pull origin master
 pnpm build

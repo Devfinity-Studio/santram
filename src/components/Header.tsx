@@ -15,7 +15,7 @@ export default async function Header() {
 				{/* Brand Link */}
 				<Link href="/" className="flex items-center gap-3 transition-opacity hover:opacity-90">
 					<Image
-						alt="Asmee Pharma Logo"
+						alt="Santram Pharma Logo"
 						className="h-8 w-auto object-contain"
 						height={36}
 						priority
@@ -24,7 +24,7 @@ export default async function Header() {
 					/>
 					<div className="flex flex-col">
 						<span className="font-extrabold text-slate-900 text-lg tracking-wider leading-tight">
-							ASMEE <span className="text-cyan-600">PHARMA</span>
+							SANTRAM <span className="text-cyan-600">PHARMA</span>
 						</span>
 						<span className="font-semibold text-[10px] text-cyan-700 tracking-widest uppercase">
 							LOGISTICS PORTAL

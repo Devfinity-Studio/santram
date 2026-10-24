@@ -4,7 +4,7 @@ import { getLicenseStatus } from "@/lib/license";
 import { DeveloperSecretTrigger } from "./secret-trigger";
 
 export const metadata = {
-	title: "Subscription Status | PharmaQL | Asmee Pharma",
+	title: "Subscription Status | PharmaQL | Santram Pharma",
 };
 
 export const dynamic = "force-dynamic";

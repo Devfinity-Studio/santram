@@ -32,9 +32,9 @@ authRouter.post("/mr-lookup", async (req: Request, res: Response) => {
         m.ID AS CompanyID,
         m.Code AS CompanyCode,
         m.Description AS CompanyName
-      FROM \`pdyasvmaster\`.\`l_mktcompany_mr\` mr
-      LEFT JOIN \`pdyasvmaster\`.\`l_mktcompany\` l ON mr.DivisionID = l.ID
-      LEFT JOIN \`pdyasvmaster\`.\`m_mktcompany\` m ON l.CompCode = m.Code
+      FROM \`pdyspvmaster\`.\`l_mktcompany_mr\` mr
+      LEFT JOIN \`pdyspvmaster\`.\`l_mktcompany\` l ON mr.DivisionID = l.ID
+      LEFT JOIN \`pdyspvmaster\`.\`m_mktcompany\` m ON l.CompCode = m.Code
       WHERE mr.EmailId = ? OR mr.MobileNo = ? OR mr.MRName = ?
       ORDER BY mr.ID ASC
       `,

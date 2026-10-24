@@ -46,9 +46,8 @@ import { DevLivePresence } from "./dev-live-presence";
 import type { LicenseStatusResult } from "@/lib/license";
 import type { FeatureKey, FeatureScope, MaintenanceConfig } from "@/lib/maintenance";
 import type { RuntimeConfig } from "@/lib/runtime-config";
+import type { ServiceHealthReport, UnifiedLogRecord } from "@/types/diagnostics";
 import {
-	type ServiceHealthReport,
-	type UnifiedLogRecord,
 	executeProcedureSandbox,
 	flushAllRateLimits,
 	flushMasterDataCaches,
@@ -119,7 +118,7 @@ export function DevControlCenter({
 	>((initialTabFromUrl as any) || "status");
 
 	// Debug Console states
-	const [debugEmailRecipient, setDebugEmailRecipient] = useState(initialLicense.developerEmail || "dev@asmeepharma.com");
+	const [debugEmailRecipient, setDebugEmailRecipient] = useState(initialLicense.developerEmail || "dev@santrampharma.com");
 	const [debugEmailTemplate, setDebugEmailTemplate] = useState<
 		"CUSTOM" | "OTP_PREVIEW" | "SUBSCRIPTION_PREVIEW" | "SYSTEM_ALERT_PREVIEW"
 	>("OTP_PREVIEW");
@@ -144,7 +143,7 @@ export function DevControlCenter({
 	const [license, setLicense] = useState(initialLicense);
 	const [extensionDays, setExtensionDays] = useState<number>(365);
 	const [customExpiry, setCustomExpiry] = useState<string>(initialLicense.expiresAt.slice(0, 10));
-	const defaultAdminEmail = (initialLicense.adminEmails && initialLicense.adminEmails[0]) || "asmeepharma2022@gmail.com";
+	const defaultAdminEmail = (initialLicense.adminEmails && initialLicense.adminEmails[0]) || "santrampharma2022@gmail.com";
 	const initialRecipients = (initialLicense.adminEmails || [])
 		.map((e) => e.trim())
 		.filter((e) => Boolean(e) && e.toLowerCase() !== "admin@admin.com");
@@ -208,34 +207,42 @@ export function DevControlCenter({
 	// 1. License Handlers
 	const handleExtendLicense = (days: number) => {
 		startTransition(async () => {
-			const currentExpiry = new Date(license.expiresAt).getTime();
-			const newExpiry = new Date(Math.max(Date.now(), currentExpiry) + days * 24 * 60 * 60 * 1000).toISOString();
-			const updated = await saveLicenseConfigAction({ expiresAt: newExpiry });
-			setLicense((prev) => ({
-				...prev,
-				expiresAt: updated.expiresAt,
-				daysRemaining: Math.ceil((new Date(updated.expiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24)),
-				isBlocked: false,
-				status: "ACTIVE",
-			}));
-			showFeedback("success", `Subscription extended by ${days} days until ${newExpiry.slice(0, 10)}.`);
-			router.refresh();
+			try {
+				const currentExpiry = new Date(license.expiresAt).getTime();
+				const newExpiry = new Date(Math.max(Date.now(), currentExpiry) + days * 24 * 60 * 60 * 1000).toISOString();
+				const updated = await saveLicenseConfigAction({ expiresAt: newExpiry });
+				setLicense((prev) => ({
+					...prev,
+					expiresAt: updated.expiresAt,
+					daysRemaining: Math.ceil((new Date(updated.expiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24)),
+					isBlocked: false,
+					status: "ACTIVE",
+				}));
+				showFeedback("success", `Subscription extended by ${days} days until ${newExpiry.slice(0, 10)}.`);
+				router.refresh();
+			} catch (err: any) {
+				showFeedback("error", `Failed to extend subscription: ${err.message || err}`);
+			}
 		});
 	};
 
 	const handleSaveCustomExpiry = () => {
 		startTransition(async () => {
-			const newExpiry = new Date(`${customExpiry}T23:59:59.000Z`).toISOString();
-			const updated = await saveLicenseConfigAction({ expiresAt: newExpiry });
-			setLicense((prev) => ({
-				...prev,
-				expiresAt: updated.expiresAt,
-				daysRemaining: Math.ceil((new Date(updated.expiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24)),
-				isBlocked: false,
-				status: "ACTIVE",
-			}));
-			showFeedback("success", `Subscription expiration updated to ${customExpiry}.`);
-			router.refresh();
+			try {
+				const newExpiry = new Date(`${customExpiry}T23:59:59.000Z`).toISOString();
+				const updated = await saveLicenseConfigAction({ expiresAt: newExpiry });
+				setLicense((prev) => ({
+					...prev,
+					expiresAt: updated.expiresAt,
+					daysRemaining: Math.ceil((new Date(updated.expiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24)),
+					isBlocked: false,
+					status: "ACTIVE",
+				}));
+				showFeedback("success", `Subscription expiration updated to ${customExpiry}.`);
+				router.refresh();
+			} catch (err: any) {
+				showFeedback("error", `Failed to update expiration: ${err.message || err}`);
+			}
 		});
 	};
 
@@ -245,10 +252,14 @@ export function DevControlCenter({
 			return;
 		}
 		startTransition(async () => {
-			await saveLicenseConfigAction({ killswitchActive: nextState });
-			setLicense((prev) => ({ ...prev, killswitchActive: nextState, isBlocked: nextState }));
-			showFeedback(nextState ? "error" : "success", nextState ? "Emergency killswitch ACTIVATED. Platform access frozen." : "Emergency killswitch deactivated. Platform access restored.");
-			router.refresh();
+			try {
+				await saveLicenseConfigAction({ killswitchActive: nextState });
+				setLicense((prev) => ({ ...prev, killswitchActive: nextState, isBlocked: nextState }));
+				showFeedback(nextState ? "error" : "success", nextState ? "Emergency killswitch ACTIVATED. Platform access frozen." : "Emergency killswitch deactivated. Platform access restored.");
+				router.refresh();
+			} catch (err: any) {
+				showFeedback("error", `Failed to toggle killswitch: ${err.message || err}`);
+			}
 		});
 	};
 
@@ -261,19 +272,23 @@ export function DevControlCenter({
 			return;
 		}
 		startTransition(async () => {
-			const updated = await suspendPlatformUsageAction();
-			setLicense((prev) => ({
-				...prev,
-				status: "SUSPENDED",
-				killswitchActive: true,
-				isBlocked: true,
-				reason: "Software access has been suspended due to subscription renewal requirement.",
-			}));
-			showFeedback(
-				"error",
-				"Platform usage has been SUSPENDED immediately due to subscription. MRs and standard Admins are blocked.",
-			);
-			router.refresh();
+			try {
+				const updated = await suspendPlatformUsageAction();
+				setLicense((prev) => ({
+					...prev,
+					status: "SUSPENDED",
+					killswitchActive: true,
+					isBlocked: true,
+					reason: "Software access has been suspended due to subscription renewal requirement.",
+				}));
+				showFeedback(
+					"error",
+					"Platform usage has been SUSPENDED immediately due to subscription. MRs and standard Admins are blocked.",
+				);
+				router.refresh();
+			} catch (err: any) {
+				showFeedback("error", `Failed to suspend usage: ${err.message || err}`);
+			}
 		});
 	};
 
@@ -286,74 +301,90 @@ export function DevControlCenter({
 			return;
 		}
 		startTransition(async () => {
-			const updated = await forceExpireSubscriptionAction();
-			setLicense((prev) => ({
-				...prev,
-				status: "EXPIRED",
-				killswitchActive: false,
-				expiresAt: updated.expiresAt,
-				daysRemaining: -30,
-				isBlocked: true,
-				reason: "Software subscription expired. Grace period elapsed.",
-			}));
-			showFeedback(
-				"error",
-				"Subscription status set to EXPIRED. Platform lock screen activated.",
-			);
-			router.refresh();
+			try {
+				const updated = await forceExpireSubscriptionAction();
+				setLicense((prev) => ({
+					...prev,
+					status: "EXPIRED",
+					killswitchActive: false,
+					expiresAt: updated.expiresAt,
+					daysRemaining: -30,
+					isBlocked: true,
+					reason: "Software subscription expired. Grace period elapsed.",
+				}));
+				showFeedback(
+					"error",
+					"Subscription status set to EXPIRED. Platform lock screen activated.",
+				);
+				router.refresh();
+			} catch (err: any) {
+				showFeedback("error", `Failed to expire subscription: ${err.message || err}`);
+			}
 		});
 	};
 
 	const handleRestoreActiveAccess = () => {
 		startTransition(async () => {
-			const updated = await restorePlatformUsageAction();
-			const daysRemaining = Math.ceil(
-				(new Date(updated.expiresAt).getTime() - Date.now()) /
+			try {
+				const updated = await restorePlatformUsageAction();
+				const daysRemaining = Math.ceil(
+					(new Date(updated.expiresAt).getTime() - Date.now()) /
 					(1000 * 60 * 60 * 24),
-			);
-			setLicense((prev) => ({
-				...prev,
-				status: "ACTIVE",
-				killswitchActive: false,
-				expiresAt: updated.expiresAt,
-				daysRemaining,
-				isBlocked: false,
-				reason: undefined,
-			}));
-			showFeedback(
-				"success",
-				"Platform access RESTORED! Subscription is now ACTIVE and all users are unblocked.",
-			);
-			router.refresh();
+				);
+				setLicense((prev) => ({
+					...prev,
+					status: "ACTIVE",
+					killswitchActive: false,
+					expiresAt: updated.expiresAt,
+					daysRemaining,
+					isBlocked: false,
+					reason: undefined,
+				}));
+				showFeedback(
+					"success",
+					"Platform access RESTORED! Subscription is now ACTIVE and all users are unblocked.",
+				);
+				router.refresh();
+			} catch (err: any) {
+				showFeedback("error", `Failed to restore access: ${err.message || err}`);
+			}
 		});
 	};
 
 	const handleSaveAdminEmails = () => {
 		startTransition(async () => {
-			const emails = adminEmailsStr
-				.split(",")
-				.map((e) => e.trim())
-				.filter((e) => Boolean(e) && e.toLowerCase() !== "admin@admin.com");
-			const targets = emails.length > 0 ? emails : [(license.adminEmails && license.adminEmails[0]) || "asmeepharma2022@gmail.com"];
-			await saveLicenseConfigAction({ adminEmails: targets });
-			setLicense((prev) => ({ ...prev, adminEmails: targets }));
-			showFeedback("success", `Notification recipient(s) saved: ${targets.join(", ")}`);
+			try {
+				const emails = adminEmailsStr
+					.split(",")
+					.map((e) => e.trim())
+					.filter((e) => Boolean(e) && e.toLowerCase() !== "admin@admin.com");
+				const targets = emails.length > 0 ? emails : [(license.adminEmails && license.adminEmails[0]) || "santrampharma2022@gmail.com"];
+				await saveLicenseConfigAction({ adminEmails: targets });
+				setLicense((prev) => ({ ...prev, adminEmails: targets }));
+				showFeedback("success", `Notification recipient(s) saved: ${targets.join(", ")}`);
+			} catch (err: any) {
+				showFeedback("error", `Failed to save recipient(s): ${err.message || err}`);
+			}
 		});
 	};
 
 	const handleSendRenewalEmails = () => {
 		startTransition(async () => {
-			const emails = adminEmailsStr
-				.split(",")
-				.map((e) => e.trim())
-				.filter((e) => Boolean(e) && e.toLowerCase() !== "admin@admin.com");
-			const targets = emails.length > 0 ? emails : [(license.adminEmails && license.adminEmails[0]) || "asmeepharma2022@gmail.com"];
-			const res = await triggerSubscriptionReminderEmails(customRenewalNote, targets, renewalSenderGateway);
-			if (res.success) {
-				showFeedback("success", res.message);
-				setCustomRenewalNote("");
-			} else {
-				showFeedback("error", res.message);
+			try {
+				const emails = adminEmailsStr
+					.split(",")
+					.map((e) => e.trim())
+					.filter((e) => Boolean(e) && e.toLowerCase() !== "admin@admin.com");
+				const targets = emails.length > 0 ? emails : [(license.adminEmails && license.adminEmails[0]) || "santrampharma2022@gmail.com"];
+				const res = await triggerSubscriptionReminderEmails(customRenewalNote, targets, renewalSenderGateway);
+				if (res.success) {
+					showFeedback("success", res.message);
+					setCustomRenewalNote("");
+				} else {
+					showFeedback("error", res.message);
+				}
+			} catch (err: any) {
+				showFeedback("error", `Failed to send renewal notices: ${err.message || err}`);
 			}
 		});
 	};
@@ -361,54 +392,78 @@ export function DevControlCenter({
 	// 2. Maintenance & Feature Switchboard Handlers
 	const handleSaveMaintenance = () => {
 		startTransition(async () => {
-			const updated = await saveMaintenanceConfigAction(maintenance);
-			setMaintenance(updated);
-			showFeedback("success", "Global maintenance settings updated.");
-			router.refresh();
+			try {
+				const updated = await saveMaintenanceConfigAction(maintenance);
+				setMaintenance(updated);
+				showFeedback("success", "Global maintenance settings updated.");
+				router.refresh();
+			} catch (err: any) {
+				showFeedback("error", `Failed to update maintenance: ${err.message || err}`);
+			}
 		});
 	};
 
 	const handleToggleFeature = (key: FeatureKey, scope: FeatureScope) => {
 		startTransition(async () => {
-			const next = await saveFeatureToggleAction(key, scope);
-			setToggles(next);
-			showFeedback("success", `Feature ${key.toUpperCase()} set to ${scope}.`);
+			try {
+				const next = await saveFeatureToggleAction(key, scope);
+				setToggles(next);
+				showFeedback("success", `Feature ${key.toUpperCase()} set to ${scope}.`);
+			} catch (err: any) {
+				showFeedback("error", `Failed to toggle feature: ${err.message || err}`);
+			}
 		});
 	};
 
 	// 3. Runtime Config Handler
 	const handleSaveRuntime = () => {
 		startTransition(async () => {
-			const updated = await saveRuntimeConfigAction(runtime);
-			setRuntime(updated);
-			showFeedback("success", "Runtime configuration saved successfully.");
+			try {
+				const updated = await saveRuntimeConfigAction(runtime);
+				setRuntime(updated);
+				showFeedback("success", "Runtime configuration saved successfully.");
+			} catch (err: any) {
+				showFeedback("error", `Failed to save runtime config: ${err.message || err}`);
+			}
 		});
 	};
 
 	// 4. Cache & Rate Limits
 	const handleFlushRateLimits = () => {
 		startTransition(async () => {
-			const res = await flushAllRateLimits();
-			showFeedback("success", res.message);
+			try {
+				const res = await flushAllRateLimits();
+				showFeedback("success", res.message);
+			} catch (err: any) {
+				showFeedback("error", `Failed to flush rate limits: ${err.message || err}`);
+			}
 		});
 	};
 
 	const handleFlushCache = () => {
 		startTransition(async () => {
-			const res = await flushMasterDataCaches();
-			showFeedback("success", res.message);
+			try {
+				const res = await flushMasterDataCaches();
+				showFeedback("success", res.message);
+			} catch (err: any) {
+				showFeedback("error", `Failed to flush caches: ${err.message || err}`);
+			}
 		});
 	};
 
 	// 5. Impersonation
 	const handleStartImpersonate = (mrId: string) => {
 		startTransition(async () => {
-			const res = await startMrImpersonation(mrId);
-			if (res.success) {
-				router.push("/dashboard");
-				router.refresh();
-			} else {
-				showFeedback("error", res.error || "Failed to start simulation");
+			try {
+				const res = await startMrImpersonation(mrId);
+				if (res.success) {
+					router.push("/dashboard");
+					router.refresh();
+				} else {
+					showFeedback("error", res.error || "Failed to start simulation");
+				}
+			} catch (err: any) {
+				showFeedback("error", `Failed to start impersonation: ${err.message || err}`);
 			}
 		});
 	};
@@ -469,15 +524,15 @@ export function DevControlCenter({
 		const escapedLoc = `'${locParam.replace(/'/g, "''")}'`;
 
 		if (selectedProcedure === "rptStockMovementStatement") {
-			return `SET sql_mode = '';\nCALL \`pdyasvtrans\`.\`rptStockMovementStatement\`(11, ${escapedLoc}, 202627, {d '2026-04-01'}, ${odbcFrom}, ${odbcTo}, ${compParam}, '', '', 'PRate');`;
+			return `SET sql_mode = '';\nCALL \`pdyspvtrans\`.\`rptStockMovementStatement\`(11, ${escapedLoc}, 202627, {d '2026-04-01'}, ${odbcFrom}, ${odbcTo}, ${compParam}, '', '', 'PRate');`;
 		} else if (selectedProcedure === "rptStockandSalesStatementReport") {
-			return `SET sql_mode = '';\nCALL \`pdyasvtrans\`.\`rptStockandSalesStatementReport\`(11, ${escapedLoc}, ${odbcFrom}, ${odbcTo}, ${compParam}, '', '', 202627, 'N', '', 'Y');`;
+			return `SET sql_mode = '';\nCALL \`pdyspvtrans\`.\`rptStockandSalesStatementReport\`(11, ${escapedLoc}, ${odbcFrom}, ${odbcTo}, ${compParam}, '', '', 202627, 'N', '', 'Y');`;
 		} else if (selectedProcedure === "rptItemCustomerSale") {
-			return `SET sql_mode = '';\nCALL \`pdyasvtrans\`.\`rptItemCustomerSale\`(${odbcFrom}, ${odbcTo}, 11, ${escapedLoc}, 202627, '', '', '', ${compParam}, '', 'Y', '', '', ${escapedLoc}, 'SalesEntry', '');`;
+			return `SET sql_mode = '';\nCALL \`pdyspvtrans\`.\`rptItemCustomerSale\`(${odbcFrom}, ${odbcTo}, 11, ${escapedLoc}, 202627, '', '', '', ${compParam}, '', 'Y', '', '', ${escapedLoc}, 'SalesEntry', '');`;
 		} else if (selectedProcedure === "rptMRwisePeriodicalOutstanding") {
-			return `SET sql_mode = '';\nCALL \`pdyasvtrans\`.\`rptMRwisePeriodicalOutstanding\`(11, 11, 202627, {d '2026-04-01'}, ${odbcFrom}, ${odbcTo}, '', '', 'All', '', '', ${compParam}, '', '', '');`;
+			return `SET sql_mode = '';\nCALL \`pdyspvtrans\`.\`rptMRwisePeriodicalOutstanding\`(11, 11, 202627, {d '2026-04-01'}, ${odbcFrom}, ${odbcTo}, '', '', 'All', '', '', ${compParam}, '', '', '');`;
 		} else if (selectedProcedure === "rptCompanyCustomerItemwiseSales") {
-			return `SET sql_mode = '';\nCALL \`pdyasvtrans\`.\`rptCompanyCustomerItemwiseSales\`(11, ${escapedLoc}, 202627, ${odbcFrom}, ${odbcTo}, '', ${compParam}, '', '', 'Y', '');`;
+			return `SET sql_mode = '';\nCALL \`pdyspvtrans\`.\`rptCompanyCustomerItemwiseSales\`(11, ${escapedLoc}, 202627, ${odbcFrom}, ${odbcTo}, '', ${compParam}, '', '', 'Y', '');`;
 		}
 		return `SET sql_mode = '';\nCALL \`${selectedProcedure}\`(...);`;
 	}, [selectedProcedure, sandboxFromDate, sandboxToDate, sandboxCompanyCode]);
@@ -492,16 +547,24 @@ export function DevControlCenter({
 
 	const handleRunSandbox = () => {
 		startTransition(async () => {
-			const res = await executeProcedureSandbox({
-				procedureName: selectedProcedure,
-				params: {
-					fromDate: sandboxFromDate,
-					toDate: sandboxToDate,
-					companyCode: sandboxCompanyCode,
-					locNo: "11",
-				},
-			});
-			setSandboxResult(res);
+			try {
+				const res = await executeProcedureSandbox({
+					procedureName: selectedProcedure,
+					params: {
+						fromDate: sandboxFromDate,
+						toDate: sandboxToDate,
+						companyCode: sandboxCompanyCode,
+						locNo: "11",
+					},
+				});
+				setSandboxResult(res);
+			} catch (err: any) {
+				setSandboxResult({
+					success: false,
+					error: err.message || "Failed to execute sandbox query",
+				});
+				showFeedback("error", `Query execution failed: ${err.message || err}`);
+			}
 		});
 	};
 
@@ -569,69 +632,93 @@ export function DevControlCenter({
 
 	const handleVerifyAdminMailer = () => {
 		startTransition(async () => {
-			const res = await verifyMailerCredentialsAction("ADMIN");
-			setAdminVerifyResult(res);
-			showFeedback(
-				res.success ? "success" : "error",
-				res.success
-					? `Admin SMTP handshake verified (${res.latencyMs}ms)`
-					: res.error || "Admin SMTP handshake failed",
-			);
+			try {
+				const res = await verifyMailerCredentialsAction("ADMIN");
+				setAdminVerifyResult(res);
+				showFeedback(
+					res.success ? "success" : "error",
+					res.success
+						? `Admin SMTP handshake verified (${res.latencyMs}ms)`
+						: res.error || "Admin SMTP handshake failed",
+				);
+			} catch (err: any) {
+				showFeedback("error", `Admin SMTP verification failed: ${err.message || err}`);
+			}
 		});
 	};
 
 	const handleVerifyDevMailer = () => {
 		startTransition(async () => {
-			const res = await verifyMailerCredentialsAction("DEVELOPER");
-			setDevVerifyResult(res);
-			showFeedback(
-				res.success ? "success" : "error",
-				res.success
-					? `Developer SMTP handshake verified (${res.latencyMs}ms)`
-					: res.error || "Developer SMTP handshake failed",
-			);
+			try {
+				const res = await verifyMailerCredentialsAction("DEVELOPER");
+				setDevVerifyResult(res);
+				showFeedback(
+					res.success ? "success" : "error",
+					res.success
+						? `Developer SMTP handshake verified (${res.latencyMs}ms)`
+						: res.error || "Developer SMTP handshake failed",
+				);
+			} catch (err: any) {
+				showFeedback("error", `Developer SMTP verification failed: ${err.message || err}`);
+			}
 		});
 	};
 
 	const handleRunStorageBenchmark = () => {
 		startTransition(async () => {
-			const res = await probeStorageLatencyAction();
-			setStorageBenchmarkResult(res);
-			showFeedback(
-				res.success ? "success" : "error",
-				res.success
-					? `Storage benchmark passed (Write: ${res.writeLatencyMs}ms, Read: ${res.readLatencyMs}ms)`
-					: res.error || "Storage probe failed",
-			);
+			try {
+				const res = await probeStorageLatencyAction();
+				setStorageBenchmarkResult(res);
+				showFeedback(
+					res.success ? "success" : "error",
+					res.success
+						? `Storage benchmark passed (Write: ${res.writeLatencyMs}ms, Read: ${res.readLatencyMs}ms)`
+						: res.error || "Storage probe failed",
+				);
+			} catch (err: any) {
+				showFeedback("error", `Storage benchmark probe failed: ${err.message || err}`);
+			}
 		});
 	};
 
 	const handleRunDbBenchmark = () => {
 		startTransition(async () => {
-			const res = await probeDatabaseLatencyAction();
-			setDbBenchmarkResult(res);
-			showFeedback(
-				res.success ? "success" : "error",
-				res.success
-					? `Database gateway responded in ${res.latencyMs}ms`
-					: res.error || "Database ping failed",
-			);
+			try {
+				const res = await probeDatabaseLatencyAction();
+				setDbBenchmarkResult(res);
+				showFeedback(
+					res.success ? "success" : "error",
+					res.success
+						? `Database gateway responded in ${res.latencyMs}ms`
+						: res.error || "Database ping failed",
+				);
+			} catch (err: any) {
+				showFeedback("error", `Database probe failed: ${err.message || err}`);
+			}
 		});
 	};
 
 	const handleCheckClientRateLimit = () => {
 		startTransition(async () => {
-			const res = await getClientRateLimitStatusAction();
-			setClientRateLimitResult(res);
-			showFeedback("success", `Resolved client IP: ${res.ip}`);
+			try {
+				const res = await getClientRateLimitStatusAction();
+				setClientRateLimitResult(res);
+				showFeedback("success", `Resolved client IP: ${res.ip}`);
+			} catch (err: any) {
+				showFeedback("error", `Failed to resolve client IP: ${err.message || err}`);
+			}
 		});
 	};
 
 	const handleResetClientRateLimit = () => {
 		startTransition(async () => {
-			const res = await resetClientIpRateLimitAction();
-			setClientRateLimitResult((prev: any) => ({ ...prev, isLocked: false }));
-			showFeedback("success", res.message);
+			try {
+				const res = await resetClientIpRateLimitAction();
+				setClientRateLimitResult((prev: any) => ({ ...prev, isLocked: false }));
+				showFeedback("success", res.message);
+			} catch (err: any) {
+				showFeedback("error", `Failed to reset rate limit: ${err.message || err}`);
+			}
 		});
 	};
 
@@ -728,11 +815,10 @@ export function DevControlCenter({
 					</button>
 
 					<button
-						className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-bold shadow-xs transition ${
-							license.killswitchActive
-								? "bg-rose-600 text-white hover:bg-rose-700"
-								: "border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100"
-						}`}
+						className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-bold shadow-xs transition ${license.killswitchActive
+							? "bg-rose-600 text-white hover:bg-rose-700"
+							: "border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100"
+							}`}
 						disabled={isPending}
 						onClick={handleToggleKillswitch}
 						type="button"
@@ -746,11 +832,10 @@ export function DevControlCenter({
 			{/* Feedback Notification */}
 			{feedbackMsg && (
 				<div
-					className={`flex items-center gap-2 rounded-xl p-3.5 font-semibold text-sm shadow-xs ${
-						feedbackMsg.type === "success"
-							? "border border-emerald-200 bg-emerald-50 text-emerald-800"
-							: "border border-rose-200 bg-rose-50 text-rose-800"
-					}`}
+					className={`flex items-center gap-2 rounded-xl p-3.5 font-semibold text-sm shadow-xs ${feedbackMsg.type === "success"
+						? "border border-emerald-200 bg-emerald-50 text-emerald-800"
+						: "border border-rose-200 bg-rose-50 text-rose-800"
+						}`}
 				>
 					{feedbackMsg.type === "success" ? (
 						<CheckCircle2 className="h-5 w-5 text-emerald-600" />
@@ -781,11 +866,10 @@ export function DevControlCenter({
 					const isActive = activeTab === tab.id;
 					return (
 						<button
-							className={`flex items-center gap-2 whitespace-nowrap border-b-2 px-4 py-3 font-bold text-sm transition-all ${
-								isActive
-									? "border-purple-600 text-purple-600"
-									: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-900"
-							}`}
+							className={`flex items-center gap-2 whitespace-nowrap border-b-2 px-4 py-3 font-bold text-sm transition-all ${isActive
+								? "border-purple-600 text-purple-600"
+								: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-900"
+								}`}
 							key={tab.id}
 							onClick={() => setActiveTab(tab.id as any)}
 							type="button"
@@ -802,21 +886,19 @@ export function DevControlCenter({
 				<div className="space-y-6">
 					{/* Status Overview Card */}
 					<div
-						className={`flex items-center justify-between rounded-2xl border p-5 shadow-xs ${
-							initialHealth.overallStatus === "HEALTHY"
-								? "border-emerald-200 bg-emerald-50/60"
-								: initialHealth.overallStatus === "DEGRADED"
-									? "border-amber-200 bg-amber-50/60"
-									: "border-rose-200 bg-rose-50/60"
-						}`}
+						className={`flex items-center justify-between rounded-2xl border p-5 shadow-xs ${initialHealth.overallStatus === "HEALTHY"
+							? "border-emerald-200 bg-emerald-50/60"
+							: initialHealth.overallStatus === "DEGRADED"
+								? "border-amber-200 bg-amber-50/60"
+								: "border-rose-200 bg-rose-50/60"
+							}`}
 					>
 						<div className="flex items-center gap-3">
 							<div
-								className={`flex h-12 w-12 items-center justify-center rounded-xl font-bold ${
-									initialHealth.overallStatus === "HEALTHY"
-										? "bg-emerald-600 text-white"
-										: "bg-rose-600 text-white"
-								}`}
+								className={`flex h-12 w-12 items-center justify-center rounded-xl font-bold ${initialHealth.overallStatus === "HEALTHY"
+									? "bg-emerald-600 text-white"
+									: "bg-rose-600 text-white"
+									}`}
 							>
 								<Activity className="h-6 w-6" />
 							</div>
@@ -845,20 +927,18 @@ export function DevControlCenter({
 
 					{/* Subscription Status & Immediate Suspension Control Banner */}
 					<div
-						className={`rounded-2xl border p-5 shadow-xs transition-all ${
-							license.isBlocked
-								? "border-rose-300 bg-rose-50/70"
-								: "border-purple-200 bg-white"
-						}`}
+						className={`rounded-2xl border p-5 shadow-xs transition-all ${license.isBlocked
+							? "border-rose-300 bg-rose-50/70"
+							: "border-purple-200 bg-white"
+							}`}
 					>
 						<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 							<div className="flex items-start gap-3">
 								<div
-									className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl font-bold ${
-										license.isBlocked
-											? "bg-rose-600 text-white shadow-rose-200"
-											: "bg-purple-600 text-white shadow-purple-200"
-									}`}
+									className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl font-bold ${license.isBlocked
+										? "bg-rose-600 text-white shadow-rose-200"
+										: "bg-purple-600 text-white shadow-purple-200"
+										}`}
 								>
 									{license.isBlocked ? (
 										<AlertOctagon className="h-6 w-6 animate-pulse" />
@@ -881,11 +961,10 @@ export function DevControlCenter({
 											</span>
 										</h3>
 										<span
-											className={`rounded-full px-2.5 py-0.5 font-mono text-[11px] font-bold ${
-												license.isBlocked
-													? "bg-rose-100 text-rose-800"
-													: "bg-emerald-100 text-emerald-800"
-											}`}
+											className={`rounded-full px-2.5 py-0.5 font-mono text-[11px] font-bold ${license.isBlocked
+												? "bg-rose-100 text-rose-800"
+												: "bg-emerald-100 text-emerald-800"
+												}`}
 										>
 											{license.isBlocked
 												? "LOCKOUT ACTIVE (MRs & Admins Blocked)"
@@ -895,14 +974,14 @@ export function DevControlCenter({
 									<p className="mt-1 text-xs text-gray-600" suppressHydrationWarning>
 										{license.isBlocked
 											? license.reason ||
-												"Platform usage is currently suspended due to subscription renewal requirement. Standard Admins and MRs are locked out."
+											"Platform usage is currently suspended due to subscription renewal requirement. Standard Admins and MRs are locked out."
 											: `Software license for ${license.organization} is valid and operational. Expiration date: ${new Date(
-													license.expiresAt,
-												).toLocaleDateString("en-IN", {
-													day: "numeric",
-													month: "short",
-													year: "numeric",
-												})}.`}
+												license.expiresAt,
+											).toLocaleDateString("en-IN", {
+												day: "numeric",
+												month: "short",
+												year: "numeric",
+											})}.`}
 									</p>
 								</div>
 							</div>
@@ -984,11 +1063,10 @@ export function DevControlCenter({
 									<span>Express API Server</span>
 								</div>
 								<span
-									className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${
-										initialHealth.apiServer.status === "HEALTHY"
-											? "bg-emerald-100 text-emerald-800"
-											: "bg-rose-100 text-rose-800"
-									}`}
+									className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${initialHealth.apiServer.status === "HEALTHY"
+										? "bg-emerald-100 text-emerald-800"
+										: "bg-rose-100 text-rose-800"
+										}`}
 								>
 									{initialHealth.apiServer.status}
 								</span>
@@ -1016,11 +1094,10 @@ export function DevControlCenter({
 									<span>MySQL ERP Database</span>
 								</div>
 								<span
-									className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${
-										initialHealth.database.status === "HEALTHY"
-											? "bg-emerald-100 text-emerald-800"
-											: "bg-rose-100 text-rose-800"
-									}`}
+									className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${initialHealth.database.status === "HEALTHY"
+										? "bg-emerald-100 text-emerald-800"
+										: "bg-rose-100 text-rose-800"
+										}`}
 								>
 									{initialHealth.database.status}
 								</span>
@@ -1045,11 +1122,10 @@ export function DevControlCenter({
 									<span>Gmail SMTP Mailer</span>
 								</div>
 								<span
-									className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${
-										initialHealth.mailer.status === "HEALTHY"
-											? "bg-emerald-100 text-emerald-800"
-											: "bg-amber-100 text-amber-800"
-									}`}
+									className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${initialHealth.mailer.status === "HEALTHY"
+										? "bg-emerald-100 text-emerald-800"
+										: "bg-amber-100 text-amber-800"
+										}`}
 								>
 									{initialHealth.mailer.status}
 								</span>
@@ -1102,20 +1178,18 @@ export function DevControlCenter({
 				<div className="space-y-6">
 					{/* Developer SMTP Credentials Guidance Banner */}
 					<div
-						className={`rounded-2xl border p-5 shadow-xs ${
-							maskedEnv.devSmtpUserConfigured
-								? "border-emerald-200 bg-emerald-50/70"
-								: "border-amber-200 bg-amber-50/80"
-						}`}
+						className={`rounded-2xl border p-5 shadow-xs ${maskedEnv.devSmtpUserConfigured
+							? "border-emerald-200 bg-emerald-50/70"
+							: "border-amber-200 bg-amber-50/80"
+							}`}
 					>
 						<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 							<div className="flex items-start gap-3">
 								<div
-									className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
-										maskedEnv.devSmtpUserConfigured
-											? "bg-emerald-600/10 text-emerald-700"
-											: "bg-amber-600/10 text-amber-700"
-									}`}
+									className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${maskedEnv.devSmtpUserConfigured
+										? "bg-emerald-600/10 text-emerald-700"
+										: "bg-amber-600/10 text-amber-700"
+										}`}
 								>
 									<Mail className="h-5 w-5" />
 								</div>
@@ -1125,11 +1199,10 @@ export function DevControlCenter({
 											Developer Email Sending Credentials
 										</h3>
 										<span
-											className={`rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider ${
-												maskedEnv.devSmtpUserConfigured
-													? "bg-emerald-100 text-emerald-800"
-													: "bg-amber-100 text-amber-800"
-											}`}
+											className={`rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider ${maskedEnv.devSmtpUserConfigured
+												? "bg-emerald-100 text-emerald-800"
+												: "bg-amber-100 text-amber-800"
+												}`}
 										>
 											{maskedEnv.devSmtpUserConfigured
 												? "Configured & Active"
@@ -1171,11 +1244,10 @@ export function DevControlCenter({
 							<div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 pt-3 border-t border-gray-200/60 font-mono text-xs">
 								{devVerifyResult && (
 									<div
-										className={`p-3 rounded-xl border ${
-											devVerifyResult.success
-												? "border-emerald-200 bg-white text-emerald-900"
-												: "border-rose-200 bg-white text-rose-900"
-										}`}
+										className={`p-3 rounded-xl border ${devVerifyResult.success
+											? "border-emerald-200 bg-white text-emerald-900"
+											: "border-rose-200 bg-white text-rose-900"
+											}`}
 									>
 										<div className="font-bold flex items-center justify-between">
 											<span>Developer SMTP Handshake:</span>
@@ -1189,11 +1261,10 @@ export function DevControlCenter({
 								)}
 								{adminVerifyResult && (
 									<div
-										className={`p-3 rounded-xl border ${
-											adminVerifyResult.success
-												? "border-emerald-200 bg-white text-emerald-900"
-												: "border-rose-200 bg-white text-rose-900"
-										}`}
+										className={`p-3 rounded-xl border ${adminVerifyResult.success
+											? "border-emerald-200 bg-white text-emerald-900"
+											: "border-rose-200 bg-white text-rose-900"
+											}`}
 									>
 										<div className="font-bold flex items-center justify-between">
 											<span>Admin SMTP Handshake:</span>
@@ -1314,11 +1385,10 @@ export function DevControlCenter({
 								{/* Push Result output */}
 								{pushResult && (
 									<div
-										className={`rounded-xl border p-3.5 font-mono text-xs ${
-											pushResult.success
-												? "border-emerald-200 bg-emerald-50 text-emerald-900"
-												: "border-amber-200 bg-amber-50 text-amber-900"
-										}`}
+										className={`rounded-xl border p-3.5 font-mono text-xs ${pushResult.success
+											? "border-emerald-200 bg-emerald-50 text-emerald-900"
+											: "border-amber-200 bg-amber-50 text-amber-900"
+											}`}
 									>
 										<div className="flex items-center gap-1.5 font-bold">
 											{pushResult.success ? (
@@ -1361,7 +1431,7 @@ export function DevControlCenter({
 										<div className="flex items-center gap-1.5">
 											<button
 												type="button"
-												onClick={() => setDebugEmailRecipient((license.adminEmails && license.adminEmails[0]) || "asmeepharma2022@gmail.com")}
+												onClick={() => setDebugEmailRecipient((license.adminEmails && license.adminEmails[0]) || "santrampharma2022@gmail.com")}
 												className="rounded-md border border-purple-200 bg-purple-50 px-2 py-0.5 text-[10px] font-bold text-purple-700 hover:bg-purple-100 transition-colors"
 											>
 												Admin Email
@@ -1378,7 +1448,7 @@ export function DevControlCenter({
 									<input
 										className="mt-1 w-full rounded-xl border border-gray-300 p-2.5 text-xs font-mono text-gray-900"
 										onChange={(e) => setDebugEmailRecipient(e.target.value)}
-										placeholder="admin@asmeepharma.com"
+										placeholder="admin@santrampharma.com"
 										type="email"
 										value={debugEmailRecipient}
 									/>
@@ -1455,11 +1525,10 @@ export function DevControlCenter({
 								{/* Email Result Output */}
 								{debugEmailResult && (
 									<div
-										className={`rounded-xl border p-3.5 font-mono text-xs ${
-											debugEmailResult.success
-												? "border-emerald-200 bg-emerald-50 text-emerald-900"
-												: "border-rose-200 bg-rose-50 text-rose-900"
-										}`}
+										className={`rounded-xl border p-3.5 font-mono text-xs ${debugEmailResult.success
+											? "border-emerald-200 bg-emerald-50 text-emerald-900"
+											: "border-rose-200 bg-rose-50 text-rose-900"
+											}`}
 									>
 										<div className="flex items-center gap-1.5 font-bold">
 											{debugEmailResult.success ? (
@@ -1667,13 +1736,12 @@ export function DevControlCenter({
 								<div className="flex items-center gap-2">
 									<h2 className="font-black text-xl text-gray-900">{license.organization}</h2>
 									<span
-										className={`rounded-full px-3 py-1 font-mono text-xs font-bold ${
-											license.isBlocked
-												? "bg-rose-100 text-rose-800"
-												: license.daysRemaining < 30
-													? "bg-amber-100 text-amber-800"
-													: "bg-emerald-100 text-emerald-800"
-										}`}
+										className={`rounded-full px-3 py-1 font-mono text-xs font-bold ${license.isBlocked
+											? "bg-rose-100 text-rose-800"
+											: license.daysRemaining < 30
+												? "bg-amber-100 text-amber-800"
+												: "bg-emerald-100 text-emerald-800"
+											}`}
 									>
 										{license.status} {license.isBlocked ? "(BLOCKED)" : `(${license.daysRemaining} days left)`}
 									</span>
@@ -1724,9 +1792,8 @@ export function DevControlCenter({
 								)}
 
 								<button
-									className={`rounded-xl px-3.5 py-2 font-bold text-xs text-white shadow-xs transition ${
-										license.killswitchActive ? "bg-emerald-600 hover:bg-emerald-700" : "bg-gray-800 hover:bg-gray-900"
-									}`}
+									className={`rounded-xl px-3.5 py-2 font-bold text-xs text-white shadow-xs transition ${license.killswitchActive ? "bg-emerald-600 hover:bg-emerald-700" : "bg-gray-800 hover:bg-gray-900"
+										}`}
 									disabled={isPending}
 									onClick={handleToggleKillswitch}
 									type="button"
@@ -1801,21 +1868,21 @@ export function DevControlCenter({
 							<span>Dispatch Subscription Notice Email</span>
 						</div>
 						<p className="text-xs text-gray-500">
-							Send an official license status notice from developer systems directly to the Admin Email (<span className="font-mono text-purple-700 font-bold">{adminEmailsStr.split(",")[0]?.trim() || (license.adminEmails && license.adminEmails[0]) || "asmeepharma2022@gmail.com"}</span>) or designated contact inbox.
+							Send an official license status notice from developer systems directly to the Admin Email (<span className="font-mono text-purple-700 font-bold">{adminEmailsStr.split(",")[0]?.trim() || (license.adminEmails && license.adminEmails[0]) || "santrampharma2022@gmail.com"}</span>) or designated contact inbox.
 						</p>
 
 						<div>
 							<div className="flex items-center justify-between mb-1">
 								<label className="block text-xs font-bold text-gray-700">Notification Recipient Email(s)</label>
 								<span className="text-[11px] font-mono text-purple-700 font-semibold bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200">
-									Admin Email: {adminEmailsStr.split(",")[0]?.trim() || (license.adminEmails && license.adminEmails[0]) || "asmeepharma2022@gmail.com"}
+									Admin Email: {adminEmailsStr.split(",")[0]?.trim() || (license.adminEmails && license.adminEmails[0]) || "santrampharma2022@gmail.com"}
 								</span>
 							</div>
 							<div className="flex gap-2">
 								<input
 									className="flex-1 rounded-xl border border-gray-300 px-3 py-2 text-xs font-mono text-gray-900"
 									onChange={(e) => setAdminEmailsStr(e.target.value)}
-									placeholder={(license.adminEmails && license.adminEmails[0]) || "asmeepharma2022@gmail.com"}
+									placeholder={(license.adminEmails && license.adminEmails[0]) || "santrampharma2022@gmail.com"}
 									type="text"
 									value={adminEmailsStr}
 								/>
@@ -1837,11 +1904,10 @@ export function DevControlCenter({
 							<label className="block text-xs font-bold text-gray-700 mb-1.5">Dispatch Sender Email Gateway</label>
 							<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
 								<label
-									className={`flex items-center gap-2.5 p-3 rounded-xl border text-xs cursor-pointer transition ${
-										renewalSenderGateway === "ADMIN"
-											? "border-[#0071BC] bg-blue-50/70 text-[#0B2545] font-bold"
-											: "border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100"
-									}`}
+									className={`flex items-center gap-2.5 p-3 rounded-xl border text-xs cursor-pointer transition ${renewalSenderGateway === "ADMIN"
+										? "border-[#0071BC] bg-blue-50/70 text-[#0B2545] font-bold"
+										: "border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100"
+										}`}
 								>
 									<input
 										type="radio"
@@ -1860,11 +1926,10 @@ export function DevControlCenter({
 								</label>
 
 								<label
-									className={`flex items-center gap-2.5 p-3 rounded-xl border text-xs cursor-pointer transition ${
-										renewalSenderGateway === "DEVELOPER"
-											? "border-purple-600 bg-purple-50/70 text-purple-950 font-bold"
-											: "border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100"
-									}`}
+									className={`flex items-center gap-2.5 p-3 rounded-xl border text-xs cursor-pointer transition ${renewalSenderGateway === "DEVELOPER"
+										? "border-purple-600 bg-purple-50/70 text-purple-950 font-bold"
+										: "border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100"
+										}`}
 								>
 									<input
 										type="radio"
@@ -1896,18 +1961,17 @@ export function DevControlCenter({
 						</div>
 
 						<button
-							className={`rounded-xl px-5 py-2.5 font-bold text-xs text-white shadow-xs transition ${
-								renewalSenderGateway === "ADMIN"
-									? "bg-[#0071BC] hover:bg-[#005a96]"
-									: "bg-purple-600 hover:bg-purple-700"
-							}`}
+							className={`rounded-xl px-5 py-2.5 font-bold text-xs text-white shadow-xs transition ${renewalSenderGateway === "ADMIN"
+								? "bg-[#0071BC] hover:bg-[#005a96]"
+								: "bg-purple-600 hover:bg-purple-700"
+								}`}
 							disabled={isPending}
 							onClick={handleSendRenewalEmails}
 							type="button"
 						>
 							{isPending
 								? "Sending Notice..."
-								: `Send Notice Email via ${renewalSenderGateway === "ADMIN" ? "Admin Email" : "Developer Email"} to (${adminEmailsStr.split(",")[0]?.trim() || (license.adminEmails && license.adminEmails[0]) || "asmeepharma2022@gmail.com"})`}
+								: `Send Notice Email via ${renewalSenderGateway === "ADMIN" ? "Admin Email" : "Developer Email"} to (${adminEmailsStr.split(",")[0]?.trim() || (license.adminEmails && license.adminEmails[0]) || "santrampharma2022@gmail.com"})`}
 						</button>
 					</div>
 				</div>
@@ -2092,11 +2156,10 @@ export function DevControlCenter({
 						{/* Result Output Card */}
 						{pushResult && (
 							<div
-								className={`rounded-xl border p-4 text-xs font-mono ${
-									pushResult.success
-										? "border-emerald-200 bg-emerald-50 text-emerald-900"
-										: "border-amber-200 bg-amber-50 text-amber-900"
-								}`}
+								className={`rounded-xl border p-4 text-xs font-mono ${pushResult.success
+									? "border-emerald-200 bg-emerald-50 text-emerald-900"
+									: "border-amber-200 bg-amber-50 text-amber-900"
+									}`}
 							>
 								<div className="font-bold flex items-center gap-1.5">
 									{pushResult.success ? (
@@ -2218,15 +2281,14 @@ export function DevControlCenter({
 												] as const
 											).map((opt) => (
 												<button
-													className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition ${
-														currentScope === opt.id
-															? opt.id === "ACTIVE"
-																? "bg-emerald-600 text-white font-bold"
-																: opt.id === "DISABLED_FOR_ALL"
-																	? "bg-rose-600 text-white font-bold"
-																	: "bg-amber-600 text-white font-bold"
-															: "bg-gray-100 text-gray-600 hover:bg-gray-200"
-													}`}
+													className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition ${currentScope === opt.id
+														? opt.id === "ACTIVE"
+															? "bg-emerald-600 text-white font-bold"
+															: opt.id === "DISABLED_FOR_ALL"
+																? "bg-rose-600 text-white font-bold"
+																: "bg-amber-600 text-white font-bold"
+														: "bg-gray-100 text-gray-600 hover:bg-gray-200"
+														}`}
 													disabled={isPending}
 													key={opt.id}
 													onClick={() => handleToggleFeature(item.key, opt.id)}
@@ -2405,13 +2467,12 @@ export function DevControlCenter({
 												</td>
 												<td className="px-4 py-2.5">
 													<span
-														className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${
-															log.level === "ERROR"
-																? "bg-rose-100 text-rose-800"
-																: log.level === "WARN"
-																	? "bg-amber-100 text-amber-800"
-																	: "bg-emerald-100 text-emerald-800"
-														}`}
+														className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${log.level === "ERROR"
+															? "bg-rose-100 text-rose-800"
+															: log.level === "WARN"
+																? "bg-amber-100 text-amber-800"
+																: "bg-emerald-100 text-emerald-800"
+															}`}
 													>
 														{log.level}
 													</span>
@@ -2510,7 +2571,7 @@ export function DevControlCenter({
 									<input
 										type="text"
 										className="w-full rounded-xl border border-gray-300 p-2 pl-8 pr-16 text-xs text-gray-900 placeholder:text-gray-400 bg-white shadow-xs focus:outline-none focus:ring-2 focus:ring-[#0071BC]"
-										placeholder="e.g. Asmee, 11, Generics..."
+										placeholder="e.g. Santram, 11, Generics..."
 										value={sandboxCompanySearch}
 										onChange={(e) => {
 											setSandboxCompanySearch(e.target.value);
@@ -2587,9 +2648,8 @@ export function DevControlCenter({
 											filteredCompanies.map((c, idx) => (
 												<div
 													key={`${c.companyCode}_${c.divisionName || "nodiv"}_${idx}`}
-													className={`flex items-center justify-between p-2.5 text-xs hover:bg-blue-50 cursor-pointer transition-colors ${
-														sandboxCompanyCode === c.companyCode ? "bg-blue-50 font-bold text-blue-900" : "text-gray-800"
-													}`}
+													className={`flex items-center justify-between p-2.5 text-xs hover:bg-blue-50 cursor-pointer transition-colors ${sandboxCompanyCode === c.companyCode ? "bg-blue-50 font-bold text-blue-900" : "text-gray-800"
+														}`}
 													onClick={() => {
 														setSandboxCompanyCode(c.companyCode);
 														setSandboxCompanySearch(c.companyName);
@@ -2681,11 +2741,10 @@ export function DevControlCenter({
 								{/* Summary Status Badges */}
 								<div className="flex flex-wrap gap-3 text-xs">
 									<span
-										className={`rounded-lg px-2.5 py-1 font-bold ${
-											sandboxResult.success
-												? "bg-emerald-100 text-emerald-800 border border-emerald-200"
-												: "bg-rose-100 text-rose-800 border border-rose-200"
-										}`}
+										className={`rounded-lg px-2.5 py-1 font-bold ${sandboxResult.success
+											? "bg-emerald-100 text-emerald-800 border border-emerald-200"
+											: "bg-rose-100 text-rose-800 border border-rose-200"
+											}`}
 									>
 										Status: {sandboxResult.success ? "SUCCESS" : "ERROR"}
 									</span>

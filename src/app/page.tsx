@@ -58,19 +58,19 @@ export default async function Home() {
 				{/* HERO SECTION */}
 				<section className="relative z-10 mx-auto flex min-h-[calc(100vh-80px)] max-w-7xl flex-col items-center justify-center px-6 pt-20 pb-32 text-center lg:pt-32 lg:pb-40">
 					<div className="inline-flex animate-fade-in items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-4 py-2 font-medium text-cyan-400 text-sm backdrop-blur-md transition-colors hover:bg-cyan-500/20">
-                   <span className="relative flex h-2 w-2">
-                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-75"></span>
-                      <span className="relative inline-flex h-2 w-2 rounded-full bg-cyan-500"></span>
-                   </span>
-						Welcome to Asmee Pharma
+						<span className="relative flex h-2 w-2">
+							<span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-75"></span>
+							<span className="relative inline-flex h-2 w-2 rounded-full bg-cyan-500"></span>
+						</span>
+						Welcome to Santram Pharma
 					</div>
 
 					<h1 className="mt-8 max-w-4xl animate-fade-in-up font-extrabold text-5xl text-white leading-[1.15] tracking-tight md:text-7xl md:leading-[1.12]">
 						Next-Generation
 						<br />
 						<span className="inline-block bg-gradient-to-r from-cyan-300 via-blue-400 to-indigo-400 bg-clip-text pb-1 text-transparent">
-                      Healthcare Logistics
-                   </span>
+							Healthcare Logistics
+						</span>
 					</h1>
 
 					<p
@@ -79,7 +79,7 @@ export default async function Home() {
 					>
 						Empowering medical representatives and distributors with real-time
 						insights, effortless ordering, and intelligent inventory tracking
-						for <strong className="text-white">Asmee Pharma</strong>.
+						for <strong className="text-white">Santram Pharma</strong>.
 					</p>
 
 					<div
@@ -99,7 +99,7 @@ export default async function Home() {
 								className="inline-flex items-center justify-center rounded-xl border border-slate-700/80 bg-slate-800/40 px-8 py-4 font-bold text-white backdrop-blur-md transition-all hover:bg-slate-700/60 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-[#050811]"
 								href={
 									session.user.role === "ADMIN" ||
-									session.user.role === "DEVELOPER"
+										session.user.role === "DEVELOPER"
 										? "/admin/dashboard"
 										: "/dashboard"
 								}
@@ -167,7 +167,7 @@ export default async function Home() {
 					style={{ animationDelay: "600ms", animationFillMode: "both" }}
 				>
 					<p className="text-slate-600 text-sm font-medium">
-						&copy; {new Date().getFullYear()} Asmee Pharma. All rights reserved.
+						&copy; {new Date().getFullYear()} Santram Pharma. All rights reserved.
 					</p>
 					<p className="mt-2 flex items-center justify-center gap-1 text-slate-500 text-xs">
 						Made with{" "}

@@ -37,7 +37,7 @@ reportsRouter.post("/stock-movement", async (req: Request, res: Response) => {
     const odbcToDate = formatDateToOdbc(effectiveTo);
 
     const compCodeParam = await resolveCompanyCodeParam(conn, companyCode);
-    const compNo = req.body?.compNo ?? 11;
+    const compNo = req.body?.compNo ?? 12;
     const locParam = locNo ? `('${locNo}')` : "('11')";
 
     const formattedParams = [
@@ -53,7 +53,7 @@ reportsRouter.post("/stock-movement", async (req: Request, res: Response) => {
       "'PRate'",
     ].join(", ");
 
-    const sql = `CALL \`pdyasvtrans\`.\`rptStockMovementStatement\`(${formattedParams})`;
+    const sql = `CALL \`pdyspvtrans\`.\`rptStockMovementStatement\`(${formattedParams})`;
     const [rows] = await conn.query({ sql, timeout: SP_TIMEOUT_MS } as any);
     const reportData = ((rows as any)?.[0] || []);
 
@@ -89,7 +89,7 @@ reportsRouter.post("/stock-and-sales", async (req: Request, res: Response) => {
     const odbcToDate = formatDateToOdbc(effectiveTo);
 
     const compCodeParam = await resolveCompanyCodeParam(conn, companyCode);
-    const compNo = req.body?.compNo ?? 11;
+    const compNo = req.body?.compNo ?? 12;
     const cleanLoc = locNo ? String(locNo).replace(/['"()]/g, "").trim() : "11";
     const locParam = `('${cleanLoc}')`;
 
@@ -136,7 +136,7 @@ reportsRouter.post("/stock-and-sales", async (req: Request, res: Response) => {
       showFreeParam,                                                    // 11: p_ShowFree (varchar)
     ].join(", ");
 
-    const sql = `CALL \`pdyasvtrans\`.\`rptStockandSalesStatementReport\`(${formattedParams})`;
+    const sql = `CALL \`pdyspvtrans\`.\`rptStockandSalesStatementReport\`(${formattedParams})`;
     let reportData: any[] = [];
     try {
       const [rows] = await conn.query({ sql, timeout: SP_TIMEOUT_MS } as any);
@@ -167,7 +167,7 @@ reportsRouter.post("/customer-item-sale", async (req: Request, res: Response) =>
     conn = await dbPool.getConnection();
     await conn.query("SET sql_mode = ''");
 
-    const compNo = params.compNo ?? 11;
+    const compNo = params.compNo ?? 12;
     const locNoParam = params.locNo ? `('${params.locNo}')` : "('11')";
     const finYear = params.finYear || 202627;
 
@@ -212,7 +212,7 @@ reportsRouter.post("/customer-item-sale", async (req: Request, res: Response) =>
       })
       .join(", ");
 
-    const sql = `CALL \`pdyasvtrans\`.\`rptItemCustomerSale\`(${odbcFromDate}, ${odbcToDate}, ${formattedRest})`;
+    const sql = `CALL \`pdyspvtrans\`.\`rptItemCustomerSale\`(${odbcFromDate}, ${odbcToDate}, ${formattedRest})`;
     const [callRes] = await conn.query(sql);
     const rows = Array.isArray(callRes) ? callRes[0] : callRes;
 
@@ -253,7 +253,7 @@ reportsRouter.post("/party-item-sale", async (req: Request, res: Response) => {
     conn = await dbPool.getConnection();
     await conn.query("SET sql_mode = ''");
 
-    const compNo = params.compNo ?? 11;
+    const compNo = params.compNo ?? 12;
     const locNo = params.locNo ? `('${params.locNo}')` : "('11')";
     const finYear = params.finYear || 202627;
 
@@ -283,7 +283,7 @@ reportsRouter.post("/party-item-sale", async (req: Request, res: Response) => {
       `'${seriesIdsParam.replace(/'/g, "''")}'`,
     ].join(", ");
 
-    const sql = `CALL \`pdyasvtrans\`.\`rptCompanyCustomerItemwiseSales\`(${formattedParams})`;
+    const sql = `CALL \`pdyspvtrans\`.\`rptCompanyCustomerItemwiseSales\`(${formattedParams})`;
     const [callRes] = await conn.query({ sql, timeout: SP_TIMEOUT_MS } as any);
     const rows = Array.isArray(callRes) ? callRes[0] : callRes;
 
@@ -312,7 +312,7 @@ reportsRouter.post("/mr-overdue", async (req: Request, res: Response) => {
     conn = await dbPool.getConnection();
     await conn.query("SET sql_mode = ''");
 
-    const compNo = params.compNo ?? 11;
+    const compNo = params.compNo ?? 12;
     const locNo = Number(params.locNo) || 11;
     const finYear = params.finYear || 202627;
 
@@ -390,21 +390,21 @@ reportsRouter.post("/claim-data", async (req: Request, res: Response) => {
       const effectiveFrom = matchFrom ? matchFrom[0] : String(params.fromDate).trim();
       const matchTo = String(params.toDate).match(/\d{4}-\d{2}-\d{2}/);
       const effectiveTo = matchTo ? matchTo[0] : String(params.toDate).trim();
-      const compNo = params.compNo ?? 11;
+      const compNo = params.compNo ?? 12;
       const locNo = Number(params.locNo) || 11;
       const finYear = params.finYear ?? 202627;
       const compCodeParam = await resolveCompanyCodeParam(conn, params.compCode);
 
       // Clean existing rows for this uniqueCode before populating (non-blocking if lacking DELETE grant)
       try {
-        await conn.query("DELETE FROM `pdyasvtrans`.`claimdata` WHERE `UniqueCode` = ?", [uniqueCode]);
+        await conn.query("DELETE FROM `pdyspvtrans`.`claimdata` WHERE `UniqueCode` = ?", [uniqueCode]);
       } catch (_) {
         // non-blocking pre-clean
       }
 
       try {
         const prepSql =
-          "CALL `pdyasvtrans`.`rptSaleFreeQtyStatement`(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+          "CALL `pdyspvtrans`.`rptSaleFreeQtyStatement`(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         const prepParams = [
           params.isFC || "F",
           effectiveFrom,
@@ -423,13 +423,13 @@ reportsRouter.post("/claim-data", async (req: Request, res: Response) => {
         ];
         await conn.query(prepSql, prepParams);
 
-        const sql = "CALL `pdyasvtrans`.`rptClaimData`(?)";
+        const sql = "CALL `pdyspvtrans`.`rptClaimData`(?)";
         const [callRes] = await conn.query(sql, [uniqueCode]);
         rows = Array.isArray(callRes) && Array.isArray((callRes as any)[0]) ? (callRes as any)[0] : (callRes as any) || [];
 
         // Purge temporary claimdata rows after retrieval to keep database lean
         try {
-          await conn.query("DELETE FROM `pdyasvtrans`.`claimdata` WHERE `UniqueCode` = ?", [uniqueCode]);
+          await conn.query("DELETE FROM `pdyspvtrans`.`claimdata` WHERE `UniqueCode` = ?", [uniqueCode]);
         } catch (_) {
           // non-blocking cleanup
         }
@@ -437,7 +437,7 @@ reportsRouter.post("/claim-data", async (req: Request, res: Response) => {
         console.warn("[Reports API] Stored procedure rptSaleFreeQtyStatement execution warning:", procErr.message);
       }
     } else {
-      const sql = "CALL `pdyasvtrans`.`rptClaimData`(?)";
+      const sql = "CALL `pdyspvtrans`.`rptClaimData`(?)";
       const [callRes] = await conn.query(sql, [uniqueCode]);
       rows = Array.isArray(callRes) && Array.isArray((callRes as any)[0]) ? (callRes as any)[0] : (callRes as any) || [];
     }
@@ -450,7 +450,7 @@ reportsRouter.post("/claim-data", async (req: Request, res: Response) => {
         const toDateStr = params.toDate || new Date().toISOString().slice(0, 10);
         const odbcFromDate = formatDateToOdbc(fromDateStr);
         const odbcToDate = formatDateToOdbc(toDateStr);
-        const compNo = params.compNo ?? 11;
+        const compNo = params.compNo ?? 12;
         const locNo = Number(params.locNo) || 11;
         const locNoParam = `('${locNo}')`;
         const finYear = params.finYear || 202627;
@@ -473,7 +473,7 @@ reportsRouter.post("/claim-data", async (req: Request, res: Response) => {
           "",
         ];
         const saleSql =
-          "CALL `pdyasvtrans`.`rptItemCustomerSale`(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+          "CALL `pdyspvtrans`.`rptItemCustomerSale`(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         const [saleRes] = await conn.query(saleSql, [odbcFromDate, odbcToDate, ...callParams]);
         const allSales: any[] = Array.isArray(saleRes) && Array.isArray((saleRes as any)[0]) ? (saleRes as any)[0] : [];
 
@@ -517,7 +517,7 @@ reportsRouter.post("/claim-data", async (req: Request, res: Response) => {
     res.json({
       success: true,
       data: rows || [],
-      debugSql: `CALL \`pdyasvtrans\`.\`rptClaimData\`('${uniqueCode}')`,
+      debugSql: `CALL \`pdyspvtrans\`.\`rptClaimData\`('${uniqueCode}')`,
     });
   } catch (error: any) {
     console.error("[Reports API] Claim Data Error:", error);
@@ -563,7 +563,7 @@ reportsRouter.post("/dev-procedure-sandbox", async (req: Request, res: Response)
 
     if (procedureName === "rptStockMovementStatement") {
       const formattedParams = [
-        params.compNo ?? 11,
+        params.compNo ?? 12,
         `'${locParam.replace(/'/g, "''")}'`,
         202627,
         formatDateToOdbc("2026-04-01"),
@@ -574,12 +574,12 @@ reportsRouter.post("/dev-procedure-sandbox", async (req: Request, res: Response)
         "''",
         "'PRate'",
       ].join(", ");
-      sql = `CALL \`pdyasvtrans\`.\`rptStockMovementStatement\`(${formattedParams})`;
+      sql = `CALL \`pdyspvtrans\`.\`rptStockMovementStatement\`(${formattedParams})`;
     } else if (procedureName === "rptItemCustomerSale") {
       const formattedParams = [
         odbcFrom,
         odbcTo,
-        params.compNo ?? 11,
+        params.compNo ?? 12,
         `'${locParam.replace(/'/g, "''")}'`,
         202627,
         "''",
@@ -594,10 +594,10 @@ reportsRouter.post("/dev-procedure-sandbox", async (req: Request, res: Response)
         "'SalesEntry'",
         "''",
       ].join(", ");
-      sql = `CALL \`pdyasvtrans\`.\`rptItemCustomerSale\`(${formattedParams})`;
+      sql = `CALL \`pdyspvtrans\`.\`rptItemCustomerSale\`(${formattedParams})`;
     } else if (procedureName === "rptMRwisePeriodicalOutstanding") {
       const formattedParams = [
-        params.compNo ?? 11,
+        params.compNo ?? 12,
         Number(params.locNo) || 11,
         202627,
         formatDateToOdbc("2026-04-01"),
@@ -616,7 +616,7 @@ reportsRouter.post("/dev-procedure-sandbox", async (req: Request, res: Response)
       sql = `CALL \`rptMRwisePeriodicalOutstanding\`(${formattedParams})`;
     } else if (procedureName === "rptCompanyCustomerItemwiseSales") {
       const formattedParams = [
-        params.compNo ?? 11,
+        params.compNo ?? 12,
         `'${locParam.replace(/'/g, "''")}'`,
         202627,
         odbcFrom,
@@ -628,7 +628,7 @@ reportsRouter.post("/dev-procedure-sandbox", async (req: Request, res: Response)
         "'Y'",
         "''",
       ].join(", ");
-      sql = `CALL \`pdyasvtrans\`.\`rptCompanyCustomerItemwiseSales\`(${formattedParams})`;
+      sql = `CALL \`pdyspvtrans\`.\`rptCompanyCustomerItemwiseSales\`(${formattedParams})`;
     } else if (procedureName === "rptStockandSalesStatementReport") {
       let divIdParam = "";
       const rawDivId = params.divId ?? params.div;
@@ -656,7 +656,7 @@ reportsRouter.post("/dev-procedure-sandbox", async (req: Request, res: Response)
       const finYear = params.finYear ?? 202627;
 
       const formattedParams = [
-        params.compNo ?? 11,
+        params.compNo ?? 12,
         `'${locParam.replace(/'/g, "''")}'`,
         odbcFrom,
         odbcTo,
@@ -668,7 +668,7 @@ reportsRouter.post("/dev-procedure-sandbox", async (req: Request, res: Response)
         itemCatParam ? `'${itemCatParam.replace(/'/g, "''")}'` : "''",
         showFreeParam,
       ].join(", ");
-      sql = `CALL \`pdyasvtrans\`.\`rptStockandSalesStatementReport\`(${formattedParams})`;
+      sql = `CALL \`pdyspvtrans\`.\`rptStockandSalesStatementReport\`(${formattedParams})`;
     }
 
     const [rows, fields] = await conn.query(sql);

@@ -10,7 +10,7 @@ Transform PharmaQL into an installable, high-performance Progressive Web Applica
 ### Task 1: PWA Manifest, Branding Icons & Meta Tags
 - **File**: `src/app/manifest.ts` (Next.js App Router Dynamic Manifest)
   - Configure PWA metadata:
-    - `name: "PharmaQL - Asmee Pharma MR Portal"`
+    - `name: "PharmaQL - Santram Pharma MR Portal"`
     - `short_name: "PharmaQL"`
     - `description: "Enterprise MR portal for stock movement, sales statements, and order tracking"`
     - `start_url: "/dashboard"`

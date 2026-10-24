@@ -23,21 +23,21 @@ const SELECT_MKT_MR_COLUMNS = `
 
 const LEGACY_MKT_MR_QUERY = `
   SELECT ${SELECT_MKT_MR_COLUMNS}
-  FROM \`pdyasvmaster\`.\`l_mktcompany_mr\` mr
-  LEFT JOIN \`pdyasvmaster\`.\`l_mktcompany\` l ON mr.DivisionID = l.ID
-  LEFT JOIN \`pdyasvmaster\`.\`m_mktcompany\` m ON l.CompCode = m.Code
+  FROM \`pdyspvmaster\`.\`l_mktcompany_mr\` mr
+  LEFT JOIN \`pdyspvmaster\`.\`l_mktcompany\` l ON mr.DivisionID = l.ID
+  LEFT JOIN \`pdyspvmaster\`.\`m_mktcompany\` m ON l.CompCode = m.Code
 `;
 
 function normalizeLegacyMR(raw: any) {
   const isBlocked = Number(raw.IsInActive ?? raw.IsBlocked ?? 0) === 1;
   const name = (raw.MRName || raw.Description || raw.UCode || "MR User").toString().trim();
-  const email = (raw.EmailId || `${raw.ID}@asmeepharma.com`).toString().trim();
+  const email = (raw.EmailId || `${raw.ID}@santrampharma.com`).toString().trim();
   const division = raw.DivisionName ? String(raw.DivisionName).trim() : undefined;
   const company = raw.CompanyName || raw.CompanyCode ? String(raw.CompanyName || raw.CompanyCode).trim() : undefined;
   const companyCode = raw.CompanyCode ? String(raw.CompanyCode).trim() : undefined;
 
   // Determine Rank: 1, 2, or 3 directly from database
-  // Note: ERP column in pdyasvmaster.l_mktcompany_mr is named `Ranking`
+  // Note: ERP column in pdyspvmaster.l_mktcompany_mr is named `Ranking`
   const rawRank = raw.Ranking ?? raw.ranking ?? raw.Rank ?? raw.rank ?? raw.UserRank ?? raw.MRRank;
   let explicitRank: 1 | 2 | 3 | null = null;
   if (rawRank !== undefined && rawRank !== null && String(rawRank).trim() !== "") {
@@ -123,7 +123,7 @@ masterRouter.get("/mr-info/:id", async (req: Request, res: Response) => {
       const primary = results[0];
       const name = (primary.MRName || "").trim();
       const email = (primary.EmailId || "").trim();
-      const isSynth = !email || email.toLowerCase().includes("@asmeepharma.com");
+      const isSynth = !email || email.toLowerCase().includes("@santrampharma.com");
 
       // Query all matching division rows for this MR
       const matchQuery = !isSynth
@@ -163,7 +163,7 @@ masterRouter.get("/mr-info/:id", async (req: Request, res: Response) => {
 
     // Check internal m_user
     const [userRows] = await dbPool.query(
-      `SELECT *, ID, UCode, Description, EmailId, MobileNo, IsBlocked FROM \`pdyasvmaster\`.\`m_user\` WHERE ID = ? OR UCode = ? LIMIT 1`,
+      `SELECT *, ID, UCode, Description, EmailId, MobileNo, IsBlocked FROM \`pdyspvmaster\`.\`m_user\` WHERE ID = ? OR UCode = ? LIMIT 1`,
       [isNumeric ? numId : -1, strId]
     );
     const userResults = userRows as any[];
@@ -201,9 +201,9 @@ masterRouter.get("/mrs", async (req: Request, res: Response) => {
     const sort = req.query.sort ? String(req.query.sort).trim() : "name_asc";
 
     const FROM_JOIN_SQL = `
-      FROM \`pdyasvmaster\`.\`l_mktcompany_mr\` mr
-      LEFT JOIN \`pdyasvmaster\`.\`l_mktcompany\` l ON mr.DivisionID = l.ID
-      LEFT JOIN \`pdyasvmaster\`.\`m_mktcompany\` m ON l.CompCode = m.Code
+      FROM \`pdyspvmaster\`.\`l_mktcompany_mr\` mr
+      LEFT JOIN \`pdyspvmaster\`.\`l_mktcompany\` l ON mr.DivisionID = l.ID
+      LEFT JOIN \`pdyspvmaster\`.\`m_mktcompany\` m ON l.CompCode = m.Code
     `;
 
     const whereClauses: string[] = [];
@@ -274,8 +274,8 @@ masterRouter.get("/companies", async (_req: Request, res: Response) => {
           m.Description AS companyName,
           l.ID AS divisionId,
           l.Division AS divisionName
-        FROM \`pdyasvmaster\`.\`m_mktcompany\` m
-        JOIN \`pdyasvmaster\`.\`l_mktcompany\` l ON m.Code = l.CompCode
+        FROM \`pdyspvmaster\`.\`m_mktcompany\` m
+        JOIN \`pdyspvmaster\`.\`l_mktcompany\` l ON m.Code = l.CompCode
         WHERE m.IsInActive = 0
         ORDER BY m.Description ASC, l.Division ASC
       `);
@@ -298,7 +298,7 @@ masterRouter.get("/customer-blocking", async (_req: Request, res: Response) => {
         SELECT 
           ID, CustCode, Customer, InActive, BlackList, NotAllowInvoice,
           BlackListRmk, MaxOutDays, CrossigLimitAmt
-        FROM \`pdyasvmaster\`.\`m_customer\`
+        FROM \`pdyspvmaster\`.\`m_customer\`
       `);
       return (rows as any[]) || [];
     });
@@ -346,7 +346,7 @@ masterRouter.get("/catalog", async (req: Request, res: Response) => {
           IsColdChain, ItemGroup, MISRate, HSN, TaxGrpCode, GeneralTaxP, CompNo,
           PriQty, PriContains, PriContainsUnit, LBatchNo, LPrate, LPTR, LMRP,
           LExpDt, PTRMarginP, PRateMarginP, InActive
-        FROM \`pdyasvmaster\`.\`m_item\`
+        FROM \`pdyspvmaster\`.\`m_item\`
         ${whereSql}
         ORDER BY ItemName ASC
         LIMIT ? OFFSET ?

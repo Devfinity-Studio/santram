@@ -12,7 +12,7 @@ import { getAllMRsForDev, getAllMarketingCompaniesWithDivisions } from "@/server
 import { auth } from "@/server/auth";
 
 export const metadata = {
-	title: "Developer Control Center | PharmaQL | Asmee Pharma",
+	title: "Developer Control Center | PharmaQL | Santram Pharma",
 };
 
 export const dynamic = "force-dynamic";
@@ -122,11 +122,11 @@ export default async function DeveloperControlPage() {
 		});
 	});
 
-	// Ensure standard Asmee Pharma code 11 is always in the list
+	// Ensure standard Santram Pharma code 11 is always in the list
 	if (!Array.from(companyMap.values()).some((c) => c.companyCode === "11")) {
 		companyMap.set("11_Generics", {
 			companyCode: "11",
-			companyName: "Asmee Pharma Pvt. Ltd.",
+			companyName: "Santram Pharma Pvt. Ltd.",
 			divisionName: "Generics",
 		});
 	}

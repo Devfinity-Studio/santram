@@ -18,7 +18,7 @@ Arm Medical Representatives (MRs) and Administrators with real-time Web Push Not
 ## 2. Service Worker Push & Notification Handlers (`public/sw.js`)
 - **`push` Event Handler**:
   - Receives encrypted Web Push payloads containing: `title`, `body`, `icon`, `badge`, `tag`, `data: { url, alertType }`.
-  - Renders system notifications with Asmee Pharma logo/badge, vibration pattern (`[200, 100, 200]`), and high priority.
+  - Renders system notifications with Santram Pharma logo/badge, vibration pattern (`[200, 100, 200]`), and high priority.
 - **`notificationclick` Event Handler**:
   - Automatically focuses or opens the target dashboard tab upon click (e.g. `/dashboard?tab=overdue` for overdue warnings or `/dashboard?tab=notices` for announcements).
 

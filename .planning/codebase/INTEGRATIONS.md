@@ -11,8 +11,8 @@
 PharmaQL does not connect directly from Next.js serverless functions to the MySQL database; instead, it interfaces through a dedicated API Gateway microservice (`api-server`).
 
 - **Databases Accessed:**
-  - `pdyasvtrans`: Transactional database containing live sales, stock movements, and party outstandings.
-  - `pdyasvmaster`: Master database containing MR listings (`l_mktcompany_mr`), division links (`l_mktcompany`), and company profiles (`m_mktcompany`).
+  - `pdyspvtrans`: Transactional database containing live sales, stock movements, and party outstandings.
+  - `pdyspvmaster`: Master database containing MR listings (`l_mktcompany_mr`), division links (`l_mktcompany`), and company profiles (`m_mktcompany`).
 - **Connection Configuration:**
   - Configured in `api-server/.env` using `mysql2/promise` with connection pooling (up to 25 connections, 10 max idle, 60s idle timeout, keep-alive active).
 - **Primary Stored Procedures Invoked:**
@@ -87,12 +87,12 @@ The Next.js application acts as a Backend-For-Frontend (BFF), communicating with
 
 | Variable | Required | Default | Purpose |
 |---|---|---|---|
-| `API_SERVER_URL` | No | `https://api.asmeepharma.com` | Base URL of the `api-server` microservice |
+| `API_SERVER_URL` | No | `https://api.santrampharma.com` | Base URL of the `api-server` microservice |
 | `API_SECRET_KEY` | Yes (Min 16 chars) | - | Shared secret Bearer token used to authenticate requests to `api-server` |
 | `BETTER_AUTH_SECRET` | Yes | - | Cryptographic HMAC secret used by `jose` to sign stateless session JWTs |
 | `GMAIL_USER` | Optional | - | Sender Gmail address for OTP and alerts |
 | `GMAIL_PASS` | Optional | - | 16-character Gmail App Password |
-| `ADMIN_EMAIL` | Optional | `asmeepharma2022@gmail.com` | Primary administrator login email |
+| `ADMIN_EMAIL` | Optional | `santrampharma2022@gmail.com` | Primary administrator login email |
 | `ADMIN_PASSWORD` | Optional | - | Primary administrator password |
 | `DEV_EMAIL` | Optional | `info@devfinity.net` | Developer super-admin account email |
 | `DEV_PASSWORD` | Optional | - | Developer super-admin account password |
@@ -108,6 +108,6 @@ The Next.js application acts as a Backend-For-Frontend (BFF), communicating with
 | `CLIENT_MYSQL_PORT` | No | `2903` | Port of the MySQL service |
 | `CLIENT_MYSQL_USER` | Yes | `pharmaql` | Database user with permissions to execute stored procedures |
 | `CLIENT_MYSQL_PASSWORD`| Yes | - | Database user password |
-| `CLIENT_MYSQL_DATABASE`| No | `pdyasvtrans` | Default database schema |
+| `CLIENT_MYSQL_DATABASE`| No | `pdyspvtrans` | Default database schema |
 | `API_SECRET_KEY` | Yes | - | Shared secret Bearer token to authorize incoming requests |
 | `ALLOWED_ORIGINS` | No | `http://localhost:3000` | Comma-separated list of allowed CORS origins |

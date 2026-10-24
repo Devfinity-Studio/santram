@@ -50,7 +50,7 @@
 
 ## 5. Databases & Persistence
 
-- **Primary Database:** Legacy On-Premises MySQL Database (`pdyasvtrans` transactional database, `pdyasvmaster` master records)
+- **Primary Database:** Legacy On-Premises MySQL Database (`pdyspvtrans` transactional database, `pdyspvmaster` master records)
 - **Data Access:** Stored Procedures (`rptStockMovementStatement`, `rptStockandSalesStatementReport`, `rptFreeSchemePartyWiseStatementReport`, `rptOverduePeriodicalOutstandings`, etc.) and complex multi-table SQL queries
 - **Application Server Storage:** File-based atomic JSON storage (`src/lib/server-storage.ts`) in `data/` with automatic fallback to `/tmp/pharmaql-data` on serverless environments (Vercel / AWS Lambda) for:
   - Active user sessions & presence (`active_sessions.json`)

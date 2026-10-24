@@ -15,7 +15,7 @@
 
 ### Wave 1: Backend Query Engine Hardening (`api-server`)
 - [x] Refactor `/claim-data` endpoint in `api-server/src/routes/reports.ts`:
-  - Ensure any stale data in `pdyasvtrans.claimdata` is purged (`DELETE FROM claimdata WHERE UniqueCode = ?`) before procedure execution.
+  - Ensure any stale data in `pdyspvtrans.claimdata` is purged (`DELETE FROM claimdata WHERE UniqueCode = ?`) before procedure execution.
   - Support isolated session-specific `uniqueCode` generation (`claim-${Date.now()}-${random}`) to avoid temporary table collisions.
   - Automatically purge temporary session data from `claimdata` after response retrieval.
 - [x] Validate `api-server` query execution for `STARTOS` across single-company and multi-company scenarios.

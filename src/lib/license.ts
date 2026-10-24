@@ -19,10 +19,10 @@ const DEFAULT_LICENSE: LicenseConfig = {
 	expiresAt: "2027-03-31T23:59:59.000Z",
 	gracePeriodDays: 7,
 	killswitchActive: false,
-	organization: "Asmee Pharma Pvt. Ltd.",
+	organization: "Santram Pharma Pvt. Ltd.",
 	developerEmail: process.env.DEV_EMAIL || "info@devfinity.net",
 	supportEmail: "support@devfinity.net",
-	adminEmails: [process.env.ADMIN_EMAIL || "asmeepharma2022@gmail.com"],
+	adminEmails: [process.env.ADMIN_EMAIL || "santrampharma2022@gmail.com"],
 	updatedAt: new Date().toISOString(),
 	updatedBy: "system",
 };
@@ -36,11 +36,11 @@ export async function getLicenseConfig(): Promise<LicenseConfig> {
 	const config: LicenseConfig = { ...DEFAULT_LICENSE, ...data };
 
 	// Sanitize adminEmails: replace dummy admin@admin.com with admin email from env
-	const defaultAdminEmail = process.env.ADMIN_EMAIL || "asmeepharma2022@gmail.com";
+	const defaultAdminEmail = process.env.ADMIN_EMAIL || "santrampharma2022@gmail.com";
 	if (
 		!config.adminEmails ||
 		config.adminEmails.length === 0 ||
-		(config.adminEmails.length === 1 && (config.adminEmails[0] === "admin@admin.com" || config.adminEmails[0] === "dev@asmeepharma.com"))
+		(config.adminEmails.length === 1 && (config.adminEmails[0] === "admin@admin.com" || config.adminEmails[0] === "dev@santrampharma.com"))
 	) {
 		config.adminEmails = [defaultAdminEmail];
 	}
@@ -188,7 +188,7 @@ export async function sendSubscriptionReminderEmails(
 	senderGateway: "DEVELOPER" | "ADMIN" = "DEVELOPER",
 ) {
 	const status = await getLicenseStatus();
-	const defaultAdminEmail = process.env.ADMIN_EMAIL || (status.adminEmails && status.adminEmails[0]) || "asmeepharma2022@gmail.com";
+	const defaultAdminEmail = process.env.ADMIN_EMAIL || (status.adminEmails && status.adminEmails[0]) || "santrampharma2022@gmail.com";
 	const devEmail = status.developerEmail || process.env.DEV_EMAIL || "info@devfinity.net";
 
 	// Determine recipients:
@@ -219,7 +219,7 @@ export async function sendSubscriptionReminderEmails(
 	const html = `
 		<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff;">
 			<div style="text-align: center; margin-bottom: 24px; border-bottom: 2px solid #0071BC; padding-bottom: 16px;">
-				<h2 style="color: #0B2545; margin: 0; font-size: 24px;">Asmee Pharma Pvt. Ltd.</h2>
+				<h2 style="color: #0B2545; margin: 0; font-size: 24px;">Santram Pharma Pvt. Ltd.</h2>
 				<p style="color: #0071BC; font-weight: bold; margin: 4px 0 0 0; font-size: 14px;">PharmaQL ERP Portal Software License</p>
 			</div>
 
@@ -251,13 +251,12 @@ export async function sendSubscriptionReminderEmails(
 				</table>
 			</div>
 
-			${
-				customNote
-					? `<div style="background-color: #fef3c7; border: 1px solid #fde68a; padding: 12px; border-radius: 6px; margin-bottom: 20px; font-size: 13px; color: #92400e;">
+			${customNote
+			? `<div style="background-color: #fef3c7; border: 1px solid #fde68a; padding: 12px; border-radius: 6px; margin-bottom: 20px; font-size: 13px; color: #92400e;">
 						<strong>Developer Note:</strong> ${customNote}
 					</div>`
-					: ""
-			}
+			: ""
+		}
 
 			<p style="color: #334155; font-size: 14px; line-height: 1.6;">
 				To ensure uninterrupted access for all Medical Representatives, order processing, and administrative report generation, please complete your renewal before the license expiration date.

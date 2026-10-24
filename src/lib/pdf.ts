@@ -151,22 +151,22 @@ function drawReportStationeryHeader(
 		textX = 40;
 	}
 
-	doc.text("ASMEE PHARMA PRIVATE LIMITED", textX, currentY);
+	doc.text("SANTRAM PHARMA PRIVATE LIMITED", textX, currentY);
 
 	currentY += 4.5;
 	doc.setFontSize(7.5);
 	doc.setFont("helvetica", "normal");
 	doc.setTextColor(75, 85, 99); // text-gray-600
 	doc.text(
-		"BASEMENT-GF, 11/2 ASHOK HOUSE, B/S SANSTHA VASAHAT GATE,",
+		"PATEL PEN LANE, SHIYAPURA, RAOPURA,",
 		textX,
 		currentY,
 	);
 	currentY += 3.2;
-	doc.text("PRATAP ROAD, RAOPURA, VADODARA - 390001, GUJARAT - 390024", textX, currentY);
+	doc.text("VADODARA - 390001, GUJARAT - 390024", textX, currentY);
 	currentY += 3.2;
 	doc.text(
-		"Contact: 9409789800, 9409789700 Mobile: 9409789700 Email: asmeepharma2022@gmail.com",
+		"",
 		textX,
 		currentY,
 	);
@@ -362,7 +362,7 @@ export async function generateStockPdfReport(
 			const stkAdjAdd = Number(row["Stk Adj Add"] ?? row["StkAdjAdd"] ?? 0);
 			const totalInQty = Number(
 				row["Total In Qty"] ??
-					openingQty + purchaseQty + sRetQty + stkAdjAdd,
+				openingQty + purchaseQty + sRetQty + stkAdjAdd,
 			);
 			const salesQty = Number(
 				row["Sales Qty."] ?? row["Sales Qty"] ?? row["SalesQty"] ?? 0,

@@ -34,7 +34,7 @@ export async function buildStyledExcelBuffer(options: {
 	} = options;
 
 	const workbook = new ExcelJS.Workbook();
-	workbook.creator = "Asmee Pharma - PharmaQL";
+	workbook.creator = "Santram Pharma - PharmaQL";
 	workbook.created = new Date();
 
 	const worksheet = workbook.addWorksheet(sheetName, {
@@ -45,17 +45,17 @@ export async function buildStyledExcelBuffer(options: {
 
 	// 1. Company Letterhead
 	const companyRow = worksheet.getRow(rowIndex++);
-	companyRow.getCell(1).value = "ASMEE PHARMA PRIVATE LIMITED";
+	companyRow.getCell(1).value = "SANTRAM PHARMA PRIVATE LIMITED";
 	companyRow.getCell(1).font = { name: "Calibri", size: 14, bold: true, color: { argb: "0B2545" } };
 
 	const addressRow = worksheet.getRow(rowIndex++);
 	addressRow.getCell(1).value =
-		"BASEMENT-GF, 11/2 ASHOK HOUSE, B/S SANSTHA VASAHAT GATE, PRATAP ROAD, RAOPURA, VADODARA - 390001";
-	addressRow.getCell(1).font = { name: "Calibri", size: 9, italic: true, color: { argb: "555555" } };
+		"PATEL  PEN LANE, SHIYAPURA, RAOPURA, VADODARA - 390001";
+	addressRow.getCell(1).font = { name: "Calibri", size: 12, italic: true, color: { argb: "555555" } };
 
 	const contactRow = worksheet.getRow(rowIndex++);
 	contactRow.getCell(1).value =
-		"Contact: 9409789800, 9409789700 | Email: asmeepharma2022@gmail.com";
+		"";
 	contactRow.getCell(1).font = { name: "Calibri", size: 9, italic: true, color: { argb: "555555" } };
 
 	rowIndex++; // blank separator

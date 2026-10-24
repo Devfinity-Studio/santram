@@ -36,7 +36,7 @@ async function assertDeveloperSession(customHeaders?: Headers) {
 				user: {
 					id: "dev-local",
 					name: "Local Developer",
-					email: "dev@asmeepharma.com",
+					email: "dev@santrampharma.com",
 					role: "DEVELOPER" as const,
 				},
 			};

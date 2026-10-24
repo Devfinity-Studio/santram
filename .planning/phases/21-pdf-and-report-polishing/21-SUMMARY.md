@@ -4,7 +4,7 @@
 
 ### 1. Unified Stationery Header (Web View)
 - Built `ReportStationeryHeader` in `src/components/report-stationery-header.tsx` matching the reference official company layout:
-  - Official company name: `ASMEE PHARMA PRIVATE LIMITED`
+  - Official company name: `SANTRAM PHARMA PRIVATE LIMITED`
   - Registered office address and contact/email details.
   - Distinct divider bar with `Year: 2026-27`, dynamic centered report title with period dates (`{Title} for Period of {fromDisplay} to {toDisplay}`), and customizable summary badge on the right.
 - Integrated across all 6 report views:
@@ -56,7 +56,7 @@
 
 ### 7. Mobile Touch & Homepage Polish
 - In `src/components/Header.tsx`:
-  - Wrapped Asmee Pharma logo in a crisp white rounded badge container (`bg-white/95 rounded-xl border border-white/30 shadow-md`) to ensure sharp contrast against `#020817` dark background.
+  - Wrapped Santram Pharma logo in a crisp white rounded badge container (`bg-white/95 rounded-xl border border-white/30 shadow-md`) to ensure sharp contrast against `#020817` dark background.
 - In `src/app/page.tsx`:
   - Adjusted hero title line-height (`leading-[1.15]`) and padding on gradient text to eliminate descender clipping.
 

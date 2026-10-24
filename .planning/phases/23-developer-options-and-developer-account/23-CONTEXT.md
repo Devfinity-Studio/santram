@@ -23,9 +23,9 @@ Introduce an enterprise Developer Control Center and full-fledged Developer role
   - `expiresAt`: ISO Date string (e.g., `2027-03-31T23:59:59Z`)
   - `killswitchActive`: boolean (emergency manual software freeze)
   - `gracePeriodDays`: number (e.g. 7 days grace)
-  - `organization`: "Asmee Pharma Pvt. Ltd."
+  - `organization`: "Santram Pharma Pvt. Ltd."
   - `supportEmail`: "support@devfinity.net"
-  - `developerEmail`: "dev@asmeepharma.com"
+  - `developerEmail`: "dev@santrampharma.com"
   - `adminEmails`: string[] (list of Admin notification recipients)
   - `updatedAt`: ISO Date string
   - `updatedBy`: Developer email
@@ -40,7 +40,7 @@ Introduce an enterprise Developer Control Center and full-fledged Developer role
   - Extend expiration date (e.g., +30 days, +1 year, or custom date).
   - Toggle emergency killswitch to instantly lock/unlock the entire application.
 - **Automated & Manual Renewal Emailer**:
-  - Developer action to dispatch subscription renewal / invoice reminder emails from Developer Email (`dev@asmeepharma.com` / `billing@devfinity.net`) directly to all registered Administrator emails.
+  - Developer action to dispatch subscription renewal / invoice reminder emails from Developer Email (`dev@santrampharma.com` / `billing@devfinity.net`) directly to all registered Administrator emails.
   - Template includes company name, expiry date, days remaining, bank/payment details, and official renewal contact.
 
 ---

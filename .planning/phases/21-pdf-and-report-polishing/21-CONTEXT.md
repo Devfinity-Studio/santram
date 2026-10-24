@@ -11,10 +11,10 @@
   - `Free Scheme` (`src/components/free-scheme-report-view.tsx`)
   - `Overdue` (`src/components/overdue-report-view.tsx`)
 - **Key Elements**:
-  - Asmee Pharma logo (`/logo.png`)
-  - Full company name: `ASMEE PHARMA PRIVATE LIMITED`
+  - Santram Pharma logo (`/logo.png`)
+  - Full company name: `SANTRAM PHARMA PRIVATE LIMITED`
   - Address: `BASEMENT-GF, 11/2 ASHOK HOUSE, B/S SANSTHA VASAHAT GATE, PRATAP ROAD, RAOPURA, VADODARA - 390001, GUJARAT - 24`
-  - Contacts: `Contact: 9409789800, 9409789700 Mobile: 9409789700 Email: asmeepharma2022@gmail.com`
+  - Contacts: `Contact: 9409789800, 9409789700 Mobile: 9409789700 Email: santrampharma2022@gmail.com`
   - Metadata divider with Year (`2026-27`), dynamic Report Title for Period (`DD/MM/YYYY to DD/MM/YYYY`), and count/summary statistics.
 
 ### 2. PDF Download & Report Engines (Fixed for ALL Tabs)

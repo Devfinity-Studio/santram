@@ -69,4 +69,4 @@ Phase 25 successfully equips PharmaQL with enterprise Web Push Notifications, an
   - Previous Phase 24 PWA test suite (`scratch/test-phase24-pwa.ts`): 5/5 passed.
   - TypeScript compilation (`pnpm run typecheck`): 0 errors.
   - Production build (`pnpm run build`): All 15 routes compiled cleanly.
-  - Zero writes to legacy MySQL database (`pdyasvmaster`).
+  - Zero writes to legacy MySQL database (`pdyspvmaster`).

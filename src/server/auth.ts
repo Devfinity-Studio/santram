@@ -77,7 +77,7 @@ export async function getSession(options?: {
 					const impersonatedUser: any = {
 						id: mrDetails.id,
 						name: mrDetails.name || "Simulated MR",
-						email: mrDetails.email || "mr@asmee.com",
+						email: mrDetails.email || "mr@santram.com",
 						role: "MR",
 						locNo: mrDetails.locNo || "11",
 						division: mrDetails.division || undefined,

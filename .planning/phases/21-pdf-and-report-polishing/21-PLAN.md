@@ -17,10 +17,10 @@ Polishing PharmaQL's reporting system across both Web and Export (PDF & Excel) v
 ### Task 1: Reusable Report Stationery Header
 - **Create**: `src/components/report-stationery-header.tsx`
   - Replicate the exact design from `party-report-view.tsx`:
-    - Asmee Pharma logo (`/logo.png`)
-    - Full legal company name: `ASMEE PHARMA PRIVATE LIMITED`
-    - Registered office address: `BASEMENT-GF, 11/2 ASHOK HOUSE, B/S SANSTHA VASAHAT GATE, PRATAP ROAD, RAOPURA, VADODARA - 390001, GUJARAT - 24`
-    - Contact details & email: `Contact: 9409789800, 9409789700 Mobile: 9409789700 Email: asmeepharma2022@gmail.com`
+    - Santram Pharma logo (`/logo.png`)
+    - Full legal company name: `SANTRAM PHARMA PRIVATE LIMITED`
+    - Registered office address: `PATEL  PEN LANE, SHIYAPURA, RAOPURA, VADODARA - 390001, GUJARAT - 24`
+    - Contact details & email: `Contact: 9409789800, 9409789700 Mobile: 9409789700 Email: santrampharma2022@gmail.com`
     - Divider row with `Year : 2026-27`, dynamic centered report title for date period (`{Title} for Period of {fromDisplay} to {toDisplay}`), and customizable right-aligned summary text/stat badge.
 - **Refactor Report Views to use `ReportStationeryHeader`**:
   - `src/components/stock-report-view.tsx`

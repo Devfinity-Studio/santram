@@ -8,7 +8,7 @@
 ## 1. Architectural Fragility & Technical Debt
 
 ### A. Heavy Reliance on Legacy Stored Procedures
-- **Vulnerability:** PharmaQL delegates core business calculations (Stock Balances, Free Scheme claims, Overdue aging) to legacy MySQL stored procedures (`pdyasvtrans.rptStockMovementStatement`, etc.).
+- **Vulnerability:** PharmaQL delegates core business calculations (Stock Balances, Free Scheme claims, Overdue aging) to legacy MySQL stored procedures (`pdyspvtrans.rptStockMovementStatement`, etc.).
 - **SQL Mode Quirks:** These procedures fail unless `SET sql_mode = ''` is explicitly executed on the connection session prior to invocation.
 - **Risk:** Any undocumented schema or procedure modifications made directly on the client's ERP database will immediately impact report rendering. Parameter count or type mismatches trigger opaque ODBC/MySQL error codes.
 
@@ -54,7 +54,7 @@
 - **Mitigation:** Ensure reverse proxies overwrite `X-Forwarded-For` with the true connecting socket address.
 
 ### C. MR Data Inaccuracies in ERP
-- **The Issue:** MR login strictly depends on their email address matching the `EmailId` column in `pdyasvmaster.l_mktcompany_mr`.
+- **The Issue:** MR login strictly depends on their email address matching the `EmailId` column in `pdyspvmaster.l_mktcompany_mr`.
 - **Operational Reality:** In legacy ERPs, MR emails are frequently missing, misspelled, or shared among staff.
 - **Remediation:** The system provides fallback lookup on mobile number and exposes the Admin MR Management screen (`/admin/mrs`) to allow admins to correct contact information.
 
