@@ -43,8 +43,8 @@ Add an **Overdue & Blocking Control Center** on `/admin/mrs`:
 ---
 
 ### 3. Data Integration & Architecture
-- **Live Overdue Calculation:** Evaluated dynamically via `pdyasvtrans.rptMRwisePeriodicalOutstanding`.
-- **Division Mapping:** Derived from `pdyasvmaster.l_mktcompany_mr` linked with `l_mktcompany` (`DivisionID`, `DivisionName`).
+- **Live Overdue Calculation:** Evaluated dynamically via `pdyspvtrans.rptMRwisePeriodicalOutstanding`.
+- **Division Mapping:** Derived from `pdyspvmaster.l_mktcompany_mr` linked with `l_mktcompany` (`DivisionID`, `DivisionName`).
 - **Overdue Engine:** Centralized helper function `evaluateMrOverdueStatus(mrId)` that calculates:
   - `status`: `"CLEAN"` | `"WARNING"` (80–90d) | `"DIRECT_BLOCKED"` (>90d) | `"DIVISION_BLOCKED"`.
   - `oldestDays`: maximum overdue days.

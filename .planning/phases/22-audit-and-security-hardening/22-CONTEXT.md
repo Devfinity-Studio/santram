@@ -37,7 +37,7 @@ Enhance the security posture, operational visibility, and resilience of the Phar
   - User-Agent and device context.
   - Auth event types: Login attempt, Login success, Login failure, OTP request, Session invalidation, Token renewal.
 - **Storage & Isolation**:
-  - Strict isolation: zero writes to the legacy ERP database (`pdyasvmaster` remains strictly 100% read-only).
+  - Strict isolation: zero writes to the legacy ERP database (`pdyspvmaster` remains strictly 100% read-only).
   - Use structured JSON logs / rotating local storage in `data/audit-logs.json` or dedicated server-side logger.
 
 ---

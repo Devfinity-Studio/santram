@@ -8,7 +8,7 @@
 
 ## 1. Executive Summary
 
-Phase 23 delivers a comprehensive, enterprise-grade **Developer Control Center** and formalizes the **Developer Role** (`role: "DEVELOPER"`) within PharmaQL. This system gives technical administrators and software owners full lifecycle governance over software licensing, an emergency killswitch, automated renewal reminder mailers, runtime environment hot-reloading, multi-service telemetry, unified audit/system logs, and instant MR impersonation for debugging and preview—all while guaranteeing **100% read-only integrity** for the legacy MySQL ERP database (`pdyasvmaster`).
+Phase 23 delivers a comprehensive, enterprise-grade **Developer Control Center** and formalizes the **Developer Role** (`role: "DEVELOPER"`) within PharmaQL. This system gives technical administrators and software owners full lifecycle governance over software licensing, an emergency killswitch, automated renewal reminder mailers, runtime environment hot-reloading, multi-service telemetry, unified audit/system logs, and instant MR impersonation for debugging and preview—all while guaranteeing **100% read-only integrity** for the legacy MySQL ERP database (`pdyspvmaster`).
 
 ---
 
@@ -133,7 +133,7 @@ pharmaql/
 | Stored Procedure Sandbox | **PASSED** | Whitelisted procedures benchmarked; non-whitelisted SQL injections rejected. |
 | TypeScript Compilation | **PASSED** | `pnpm exec tsc --noEmit` exits `0` with zero errors. |
 | Standalone API Server Build | **PASSED** | `api-server: npm run build` exits `0`. |
-| Database Read-Only Integrity | **PASSED** | Exactly 0 writes to `pdyasvmaster` or `pdyasvtrans`. |
+| Database Read-Only Integrity | **PASSED** | Exactly 0 writes to `pdyspvmaster` or `pdyspvtrans`. |
 
 ---
 

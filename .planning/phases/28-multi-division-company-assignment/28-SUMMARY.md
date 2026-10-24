@@ -1,7 +1,7 @@
 # Phase 28: Multi-Division MR Database Scanning & Aggregation - Execution Summary
 
 ## Objective Accomplished
-Equipped PharmaQL with an automated **Multi-Division Database Scanning and Aggregation Engine**. The ERP database (`pdyasvmaster.l_mktcompany_mr`) contains multiple rows for the same MR sharing the same `MRName` and/or `EmailId`, but each linked to different `DivisionID` values across marketing companies in `m_mktcompany`.
+Equipped PharmaQL with an automated **Multi-Division Database Scanning and Aggregation Engine**. The ERP database (`pdyspvmaster.l_mktcompany_mr`) contains multiple rows for the same MR sharing the same `MRName` and/or `EmailId`, but each linked to different `DivisionID` values across marketing companies in `m_mktcompany`.
 
 Instead of requiring manual Admin assignments or restricting MRs to a single row via `LIMIT 1`, the system now scans and consolidates all related database entries using **email-first priority**, providing reps, Admins, and Developers with seamless multi-division access and complete company-name searchability.
 

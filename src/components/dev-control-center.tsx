@@ -502,15 +502,15 @@ export function DevControlCenter({
 		const escapedLoc = `'${locParam.replace(/'/g, "''")}'`;
 
 		if (selectedProcedure === "rptStockMovementStatement") {
-			return `SET sql_mode = '';\nCALL \`pdyasvtrans\`.\`rptStockMovementStatement\`(11, ${escapedLoc}, 202627, {d '2026-04-01'}, ${odbcFrom}, ${odbcTo}, ${compParam}, '', '', 'PRate');`;
+			return `SET sql_mode = '';\nCALL \`pdyspvtrans\`.\`rptStockMovementStatement\`(11, ${escapedLoc}, 202627, {d '2026-04-01'}, ${odbcFrom}, ${odbcTo}, ${compParam}, '', '', 'PRate');`;
 		} else if (selectedProcedure === "rptStockandSalesStatementReport") {
-			return `SET sql_mode = '';\nCALL \`pdyasvtrans\`.\`rptStockandSalesStatementReport\`(11, ${escapedLoc}, ${odbcFrom}, ${odbcTo}, ${compParam}, '', '', 202627, 'N', '', 'Y');`;
+			return `SET sql_mode = '';\nCALL \`pdyspvtrans\`.\`rptStockandSalesStatementReport\`(11, ${escapedLoc}, ${odbcFrom}, ${odbcTo}, ${compParam}, '', '', 202627, 'N', '', 'Y');`;
 		} else if (selectedProcedure === "rptItemCustomerSale") {
-			return `SET sql_mode = '';\nCALL \`pdyasvtrans\`.\`rptItemCustomerSale\`(${odbcFrom}, ${odbcTo}, 11, ${escapedLoc}, 202627, '', '', '', ${compParam}, '', 'Y', '', '', ${escapedLoc}, 'SalesEntry', '');`;
+			return `SET sql_mode = '';\nCALL \`pdyspvtrans\`.\`rptItemCustomerSale\`(${odbcFrom}, ${odbcTo}, 11, ${escapedLoc}, 202627, '', '', '', ${compParam}, '', 'Y', '', '', ${escapedLoc}, 'SalesEntry', '');`;
 		} else if (selectedProcedure === "rptMRwisePeriodicalOutstanding") {
-			return `SET sql_mode = '';\nCALL \`pdyasvtrans\`.\`rptMRwisePeriodicalOutstanding\`(11, 11, 202627, {d '2026-04-01'}, ${odbcFrom}, ${odbcTo}, '', '', 'All', '', '', ${compParam}, '', '', '');`;
+			return `SET sql_mode = '';\nCALL \`pdyspvtrans\`.\`rptMRwisePeriodicalOutstanding\`(11, 11, 202627, {d '2026-04-01'}, ${odbcFrom}, ${odbcTo}, '', '', 'All', '', '', ${compParam}, '', '', '');`;
 		} else if (selectedProcedure === "rptCompanyCustomerItemwiseSales") {
-			return `SET sql_mode = '';\nCALL \`pdyasvtrans\`.\`rptCompanyCustomerItemwiseSales\`(11, ${escapedLoc}, 202627, ${odbcFrom}, ${odbcTo}, '', ${compParam}, '', '', 'Y', '');`;
+			return `SET sql_mode = '';\nCALL \`pdyspvtrans\`.\`rptCompanyCustomerItemwiseSales\`(11, ${escapedLoc}, 202627, ${odbcFrom}, ${odbcTo}, '', ${compParam}, '', '', 'Y', '');`;
 		}
 		return `SET sql_mode = '';\nCALL \`${selectedProcedure}\`(...);`;
 	}, [selectedProcedure, sandboxFromDate, sandboxToDate, sandboxCompanyCode]);
@@ -762,8 +762,8 @@ export function DevControlCenter({
 
 					<button
 						className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-bold shadow-xs transition ${license.killswitchActive
-								? "bg-rose-600 text-white hover:bg-rose-700"
-								: "border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100"
+							? "bg-rose-600 text-white hover:bg-rose-700"
+							: "border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100"
 							}`}
 						disabled={isPending}
 						onClick={handleToggleKillswitch}
@@ -779,8 +779,8 @@ export function DevControlCenter({
 			{feedbackMsg && (
 				<div
 					className={`flex items-center gap-2 rounded-xl p-3.5 font-semibold text-sm shadow-xs ${feedbackMsg.type === "success"
-							? "border border-emerald-200 bg-emerald-50 text-emerald-800"
-							: "border border-rose-200 bg-rose-50 text-rose-800"
+						? "border border-emerald-200 bg-emerald-50 text-emerald-800"
+						: "border border-rose-200 bg-rose-50 text-rose-800"
 						}`}
 				>
 					{feedbackMsg.type === "success" ? (
@@ -813,8 +813,8 @@ export function DevControlCenter({
 					return (
 						<button
 							className={`flex items-center gap-2 whitespace-nowrap border-b-2 px-4 py-3 font-bold text-sm transition-all ${isActive
-									? "border-purple-600 text-purple-600"
-									: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-900"
+								? "border-purple-600 text-purple-600"
+								: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-900"
 								}`}
 							key={tab.id}
 							onClick={() => setActiveTab(tab.id as any)}
@@ -833,17 +833,17 @@ export function DevControlCenter({
 					{/* Status Overview Card */}
 					<div
 						className={`flex items-center justify-between rounded-2xl border p-5 shadow-xs ${initialHealth.overallStatus === "HEALTHY"
-								? "border-emerald-200 bg-emerald-50/60"
-								: initialHealth.overallStatus === "DEGRADED"
-									? "border-amber-200 bg-amber-50/60"
-									: "border-rose-200 bg-rose-50/60"
+							? "border-emerald-200 bg-emerald-50/60"
+							: initialHealth.overallStatus === "DEGRADED"
+								? "border-amber-200 bg-amber-50/60"
+								: "border-rose-200 bg-rose-50/60"
 							}`}
 					>
 						<div className="flex items-center gap-3">
 							<div
 								className={`flex h-12 w-12 items-center justify-center rounded-xl font-bold ${initialHealth.overallStatus === "HEALTHY"
-										? "bg-emerald-600 text-white"
-										: "bg-rose-600 text-white"
+									? "bg-emerald-600 text-white"
+									: "bg-rose-600 text-white"
 									}`}
 							>
 								<Activity className="h-6 w-6" />
@@ -874,16 +874,16 @@ export function DevControlCenter({
 					{/* Subscription Status & Immediate Suspension Control Banner */}
 					<div
 						className={`rounded-2xl border p-5 shadow-xs transition-all ${license.isBlocked
-								? "border-rose-300 bg-rose-50/70"
-								: "border-purple-200 bg-white"
+							? "border-rose-300 bg-rose-50/70"
+							: "border-purple-200 bg-white"
 							}`}
 					>
 						<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 							<div className="flex items-start gap-3">
 								<div
 									className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl font-bold ${license.isBlocked
-											? "bg-rose-600 text-white shadow-rose-200"
-											: "bg-purple-600 text-white shadow-purple-200"
+										? "bg-rose-600 text-white shadow-rose-200"
+										: "bg-purple-600 text-white shadow-purple-200"
 										}`}
 								>
 									{license.isBlocked ? (
@@ -908,8 +908,8 @@ export function DevControlCenter({
 										</h3>
 										<span
 											className={`rounded-full px-2.5 py-0.5 font-mono text-[11px] font-bold ${license.isBlocked
-													? "bg-rose-100 text-rose-800"
-													: "bg-emerald-100 text-emerald-800"
+												? "bg-rose-100 text-rose-800"
+												: "bg-emerald-100 text-emerald-800"
 												}`}
 										>
 											{license.isBlocked
@@ -1010,8 +1010,8 @@ export function DevControlCenter({
 								</div>
 								<span
 									className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${initialHealth.apiServer.status === "HEALTHY"
-											? "bg-emerald-100 text-emerald-800"
-											: "bg-rose-100 text-rose-800"
+										? "bg-emerald-100 text-emerald-800"
+										: "bg-rose-100 text-rose-800"
 										}`}
 								>
 									{initialHealth.apiServer.status}
@@ -1041,8 +1041,8 @@ export function DevControlCenter({
 								</div>
 								<span
 									className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${initialHealth.database.status === "HEALTHY"
-											? "bg-emerald-100 text-emerald-800"
-											: "bg-rose-100 text-rose-800"
+										? "bg-emerald-100 text-emerald-800"
+										: "bg-rose-100 text-rose-800"
 										}`}
 								>
 									{initialHealth.database.status}
@@ -1069,8 +1069,8 @@ export function DevControlCenter({
 								</div>
 								<span
 									className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${initialHealth.mailer.status === "HEALTHY"
-											? "bg-emerald-100 text-emerald-800"
-											: "bg-amber-100 text-amber-800"
+										? "bg-emerald-100 text-emerald-800"
+										: "bg-amber-100 text-amber-800"
 										}`}
 								>
 									{initialHealth.mailer.status}
@@ -1125,16 +1125,16 @@ export function DevControlCenter({
 					{/* Developer SMTP Credentials Guidance Banner */}
 					<div
 						className={`rounded-2xl border p-5 shadow-xs ${maskedEnv.devSmtpUserConfigured
-								? "border-emerald-200 bg-emerald-50/70"
-								: "border-amber-200 bg-amber-50/80"
+							? "border-emerald-200 bg-emerald-50/70"
+							: "border-amber-200 bg-amber-50/80"
 							}`}
 					>
 						<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 							<div className="flex items-start gap-3">
 								<div
 									className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${maskedEnv.devSmtpUserConfigured
-											? "bg-emerald-600/10 text-emerald-700"
-											: "bg-amber-600/10 text-amber-700"
+										? "bg-emerald-600/10 text-emerald-700"
+										: "bg-amber-600/10 text-amber-700"
 										}`}
 								>
 									<Mail className="h-5 w-5" />
@@ -1146,8 +1146,8 @@ export function DevControlCenter({
 										</h3>
 										<span
 											className={`rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider ${maskedEnv.devSmtpUserConfigured
-													? "bg-emerald-100 text-emerald-800"
-													: "bg-amber-100 text-amber-800"
+												? "bg-emerald-100 text-emerald-800"
+												: "bg-amber-100 text-amber-800"
 												}`}
 										>
 											{maskedEnv.devSmtpUserConfigured
@@ -1191,8 +1191,8 @@ export function DevControlCenter({
 								{devVerifyResult && (
 									<div
 										className={`p-3 rounded-xl border ${devVerifyResult.success
-												? "border-emerald-200 bg-white text-emerald-900"
-												: "border-rose-200 bg-white text-rose-900"
+											? "border-emerald-200 bg-white text-emerald-900"
+											: "border-rose-200 bg-white text-rose-900"
 											}`}
 									>
 										<div className="font-bold flex items-center justify-between">
@@ -1208,8 +1208,8 @@ export function DevControlCenter({
 								{adminVerifyResult && (
 									<div
 										className={`p-3 rounded-xl border ${adminVerifyResult.success
-												? "border-emerald-200 bg-white text-emerald-900"
-												: "border-rose-200 bg-white text-rose-900"
+											? "border-emerald-200 bg-white text-emerald-900"
+											: "border-rose-200 bg-white text-rose-900"
 											}`}
 									>
 										<div className="font-bold flex items-center justify-between">
@@ -1332,8 +1332,8 @@ export function DevControlCenter({
 								{pushResult && (
 									<div
 										className={`rounded-xl border p-3.5 font-mono text-xs ${pushResult.success
-												? "border-emerald-200 bg-emerald-50 text-emerald-900"
-												: "border-amber-200 bg-amber-50 text-amber-900"
+											? "border-emerald-200 bg-emerald-50 text-emerald-900"
+											: "border-amber-200 bg-amber-50 text-amber-900"
 											}`}
 									>
 										<div className="flex items-center gap-1.5 font-bold">
@@ -1472,8 +1472,8 @@ export function DevControlCenter({
 								{debugEmailResult && (
 									<div
 										className={`rounded-xl border p-3.5 font-mono text-xs ${debugEmailResult.success
-												? "border-emerald-200 bg-emerald-50 text-emerald-900"
-												: "border-rose-200 bg-rose-50 text-rose-900"
+											? "border-emerald-200 bg-emerald-50 text-emerald-900"
+											: "border-rose-200 bg-rose-50 text-rose-900"
 											}`}
 									>
 										<div className="flex items-center gap-1.5 font-bold">
@@ -1683,10 +1683,10 @@ export function DevControlCenter({
 									<h2 className="font-black text-xl text-gray-900">{license.organization}</h2>
 									<span
 										className={`rounded-full px-3 py-1 font-mono text-xs font-bold ${license.isBlocked
-												? "bg-rose-100 text-rose-800"
-												: license.daysRemaining < 30
-													? "bg-amber-100 text-amber-800"
-													: "bg-emerald-100 text-emerald-800"
+											? "bg-rose-100 text-rose-800"
+											: license.daysRemaining < 30
+												? "bg-amber-100 text-amber-800"
+												: "bg-emerald-100 text-emerald-800"
 											}`}
 									>
 										{license.status} {license.isBlocked ? "(BLOCKED)" : `(${license.daysRemaining} days left)`}
@@ -1851,8 +1851,8 @@ export function DevControlCenter({
 							<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
 								<label
 									className={`flex items-center gap-2.5 p-3 rounded-xl border text-xs cursor-pointer transition ${renewalSenderGateway === "ADMIN"
-											? "border-[#0071BC] bg-blue-50/70 text-[#0B2545] font-bold"
-											: "border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100"
+										? "border-[#0071BC] bg-blue-50/70 text-[#0B2545] font-bold"
+										: "border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100"
 										}`}
 								>
 									<input
@@ -1873,8 +1873,8 @@ export function DevControlCenter({
 
 								<label
 									className={`flex items-center gap-2.5 p-3 rounded-xl border text-xs cursor-pointer transition ${renewalSenderGateway === "DEVELOPER"
-											? "border-purple-600 bg-purple-50/70 text-purple-950 font-bold"
-											: "border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100"
+										? "border-purple-600 bg-purple-50/70 text-purple-950 font-bold"
+										: "border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100"
 										}`}
 								>
 									<input
@@ -1908,8 +1908,8 @@ export function DevControlCenter({
 
 						<button
 							className={`rounded-xl px-5 py-2.5 font-bold text-xs text-white shadow-xs transition ${renewalSenderGateway === "ADMIN"
-									? "bg-[#0071BC] hover:bg-[#005a96]"
-									: "bg-purple-600 hover:bg-purple-700"
+								? "bg-[#0071BC] hover:bg-[#005a96]"
+								: "bg-purple-600 hover:bg-purple-700"
 								}`}
 							disabled={isPending}
 							onClick={handleSendRenewalEmails}
@@ -2103,8 +2103,8 @@ export function DevControlCenter({
 						{pushResult && (
 							<div
 								className={`rounded-xl border p-4 text-xs font-mono ${pushResult.success
-										? "border-emerald-200 bg-emerald-50 text-emerald-900"
-										: "border-amber-200 bg-amber-50 text-amber-900"
+									? "border-emerald-200 bg-emerald-50 text-emerald-900"
+									: "border-amber-200 bg-amber-50 text-amber-900"
 									}`}
 							>
 								<div className="font-bold flex items-center gap-1.5">
@@ -2221,8 +2221,8 @@ export function DevControlCenter({
 								Current status:{" "}
 								<span
 									className={`font-black ${maintenance.mode === "DISABLED"
-											? "text-emerald-700"
-											: "text-rose-700"
+										? "text-emerald-700"
+										: "text-rose-700"
 										}`}
 								>
 									{maintenance.mode === "DISABLED"
@@ -2266,12 +2266,12 @@ export function DevControlCenter({
 											).map((opt) => (
 												<button
 													className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition ${currentScope === opt.id
-															? opt.id === "ACTIVE"
-																? "bg-emerald-600 text-white font-bold"
-																: opt.id === "DISABLED_FOR_ALL"
-																	? "bg-rose-600 text-white font-bold"
-																	: "bg-amber-600 text-white font-bold"
-															: "bg-gray-100 text-gray-600 hover:bg-gray-200"
+														? opt.id === "ACTIVE"
+															? "bg-emerald-600 text-white font-bold"
+															: opt.id === "DISABLED_FOR_ALL"
+																? "bg-rose-600 text-white font-bold"
+																: "bg-amber-600 text-white font-bold"
+														: "bg-gray-100 text-gray-600 hover:bg-gray-200"
 														}`}
 													disabled={isPending}
 													key={opt.id}
@@ -2452,10 +2452,10 @@ export function DevControlCenter({
 												<td className="px-4 py-2.5">
 													<span
 														className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${log.level === "ERROR"
-																? "bg-rose-100 text-rose-800"
-																: log.level === "WARN"
-																	? "bg-amber-100 text-amber-800"
-																	: "bg-emerald-100 text-emerald-800"
+															? "bg-rose-100 text-rose-800"
+															: log.level === "WARN"
+																? "bg-amber-100 text-amber-800"
+																: "bg-emerald-100 text-emerald-800"
 															}`}
 													>
 														{log.level}
@@ -2726,8 +2726,8 @@ export function DevControlCenter({
 								<div className="flex flex-wrap gap-3 text-xs">
 									<span
 										className={`rounded-lg px-2.5 py-1 font-bold ${sandboxResult.success
-												? "bg-emerald-100 text-emerald-800 border border-emerald-200"
-												: "bg-rose-100 text-rose-800 border border-rose-200"
+											? "bg-emerald-100 text-emerald-800 border border-emerald-200"
+											: "bg-rose-100 text-rose-800 border border-rose-200"
 											}`}
 									>
 										Status: {sandboxResult.success ? "SUCCESS" : "ERROR"}

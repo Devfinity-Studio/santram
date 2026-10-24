@@ -18,13 +18,13 @@ Implement an automated overdue enforcement engine, division cascading blocking, 
       - `CLEAN`: No invoices >= 80 days.
       - `WARNING`: At least one invoice with `80 <= OverDays <= 90`. Calculates impending block date (`DocDate` or `DueDate` + 91 days).
       - `DIRECT_BLOCKED`: Any invoice with `OverDays > 90`.
-    - Check division cascading: If MR has no >90 day overdue invoices, check if any peer MR sharing the same `DivisionID` in `pdyasvmaster.l_mktcompany_mr` is `DIRECT_BLOCKED`. If yes, mark MR as `DIVISION_BLOCKED` and attach `responsibleMrName`, `responsibleMrId`, `invoiceNo`, `amount`.
+    - Check division cascading: If MR has no >90 day overdue invoices, check if any peer MR sharing the same `DivisionID` in `pdyspvmaster.l_mktcompany_mr` is `DIRECT_BLOCKED`. If yes, mark MR as `DIVISION_BLOCKED` and attach `responsibleMrName`, `responsibleMrId`, `invoiceNo`, `amount`.
     - Respect admin exemptions in `data/mr_overrides.json` (e.g. `unblockedUntil` or explicit admin override).
 
 - [ ] **Task 12.2: Customer / Party Blocking Lookup**
   - **File:** `src/server/actions/customerBlocking.ts`
   - **Logic:**
-    - Query `pdyasvmaster.m_customer` for `CustCode`, `InActive`, `BlackList`, `NotAllowInvoice`, `BlackListRmk`, `MaxOutDays`.
+    - Query `pdyspvmaster.m_customer` for `CustCode`, `InActive`, `BlackList`, `NotAllowInvoice`, `BlackListRmk`, `MaxOutDays`.
     - Cache customer blocking map or provide batch lookup function for reports.
 
 ---

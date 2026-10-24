@@ -47,7 +47,7 @@
 
 ## Phase 9: Legacy MySQL MR User Integration [COMPLETED]
 
-- [x] Create centralized server action `src/server/actions/mrInfo.ts` querying `pdyasvmaster.m_user` with lean column projection.
+- [x] Create centralized server action `src/server/actions/mrInfo.ts` querying `pdyspvmaster.m_user` with lean column projection.
 - [x] Migrate MR lookup across all report views (Stock, Sales, Product, Overdue, Outstanding, Free Schemes).
 - [x] Migrate MR dashboard and admin MR inspection pages to use `mrInfo.ts`.
 - [x] Update API report download endpoints to resolve MR access from legacy MySQL.
@@ -64,8 +64,8 @@
 
 - [x] Implement Stateless JWT / Signed Cookie Auth (Zero DB tables for sessions).
 - [x] Implement MR Email OTP login flow + Env-based Admin/Developer credential authentication.
-- [x] Migrate Product catalog queries to direct MySQL projection on `pdyasvmaster.m_item`.
-- [x] Migrate MR assignments and divisions to read directly from `pdyasvmaster.l_mktcompany_mr`.
+- [x] Migrate Product catalog queries to direct MySQL projection on `pdyspvmaster.m_item`.
+- [x] Migrate MR assignments and divisions to read directly from `pdyspvmaster.l_mktcompany_mr`.
 - [x] Migrate broadcast notices to `data/notices.json`.
 - [x] Completely remove Neon database dependencies from runtime routes, views, and server actions.
 
@@ -221,7 +221,7 @@
 
 ## Phase 28: Multi-Division MR Database Scanning & Aggregation [COMPLETED]
 
-- [x] **Database Scanning & Consolidation Engine**: Automatically scan and group `pdyasvmaster.l_mktcompany_mr` entries by `MRName` and `EmailId` in `mrInfo.ts` and API server, merging all duplicate records into unified MR profiles with all their `DivisionID`s, divisions, and marketing companies.
+- [x] **Database Scanning & Consolidation Engine**: Automatically scan and group `pdyspvmaster.l_mktcompany_mr` entries by `MRName` and `EmailId` in `mrInfo.ts` and API server, merging all duplicate records into unified MR profiles with all their `DivisionID`s, divisions, and marketing companies.
 - [x] **MR Impersonation & Admin MR List Enhancement**: Upgrade Developer Impersonation (`/admin/dev`) and Admin MR Management (`/admin/mrs`) to display all consolidated MRs, render all division badges on cards/tables, and enable searching by company name, company code, division, MR name, and email.
 - [x] **MR Dashboard Multi-Division Switcher**: Upgrade `MrDashboardContent` division dropdown to dynamically render all scanned divisions from `mrInfo.assignments`, enabling reps to switch between divisions or view "All Divisions".
 - [x] **Multi-Division Report Querying & Export Synchronization**: Ensure report actions and download endpoints query with the active division and its corresponding company code.

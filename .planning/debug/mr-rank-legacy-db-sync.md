@@ -14,7 +14,7 @@ next_action: None.
 
 ## Symptoms
 
-expected: Changing an MR's rank in the legacy database (e.g. `pdyasvmaster.l_mktcompany_mr`) reflects immediately in the frontend after logging out and logging back in.
+expected: Changing an MR's rank in the legacy database (e.g. `pdyspvmaster.l_mktcompany_mr`) reflects immediately in the frontend after logging out and logging back in.
 actual: Any change in the legacy database for the MR rank is not updated in the frontend, even after logging out and again logging in.
 errors: []
 reproduction: Update MR rank in the legacy MySQL database, log out of MR dashboard, log back in. The rank and permissions shown in the frontend remain the previous value.
