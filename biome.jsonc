@@ -1,0 +1,79 @@
+{
+	"$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+	"root": true,
+	"files": {
+		"ignoreUnknown": true,
+		"includes": ["src/**"]
+	},
+	"vcs": {
+		"enabled": true,
+		"useIgnoreFile": true,
+		"clientKind": "git"
+	},
+	"assist": {
+		"enabled": true,
+		"actions": {
+			"recommended": true,
+			"source": {
+				"recommended": true,
+				"organizeImports": "on",
+				"useSortedAttributes": "on"
+			}
+		}
+	},
+	"formatter": {
+		"enabled": true
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"recommended": true,
+			"a11y": {
+				"recommended": false
+			},
+			"suspicious": {
+				"noArrayIndexKey": "off"
+			},
+			"nursery": {
+				"useSortedClasses": {
+					"level": "warn",
+					"fix": "safe",
+					"options": {
+						"functions": ["clsx", "cva", "cn"]
+					}
+				}
+			}
+		}
+	},
+	"html": {
+		"formatter": {
+			"enabled": true
+		}
+	},
+	"javascript": {
+		"assist": {
+			"enabled": true
+		},
+		"formatter": {
+			"enabled": true
+		},
+		"linter": {
+			"enabled": true
+		}
+	},
+	"css": {
+		"assist": {
+			"enabled": true
+		},
+		"formatter": {
+			"enabled": true
+		},
+		"linter": {
+			"enabled": true
+		},
+		"parser": {
+			"cssModules": true,
+			"tailwindDirectives": true
+		}
+	}
+}

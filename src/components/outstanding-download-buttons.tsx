@@ -1,0 +1,311 @@
+"use client";
+
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
+import { getDefaultTMinus1MonthRange } from "@/lib/dateUtils";
+import { generateGroupedPdfReport } from "@/lib/pdf";
+
+export function OutstandingDownloadButtons({ mrId }: { mrId: string }) {
+	const searchParams = useSearchParams();
+	const division = searchParams.get("division") || "All";
+	const defaultFrom = searchParams.get("from") || "";
+	const defaultTo = searchParams.get("to") || "";
+	const party = searchParams.get("party") || "";
+
+	const [isOpen, setIsOpen] = useState(false);
+	const [format, setFormat] = useState<"csv" | "excel" | "pdf" | "print">(
+		"csv",
+	);
+	const [from, setFrom] = useState(defaultFrom);
+	const [to, setTo] = useState(defaultTo);
+	const [isDownloading, setIsDownloading] = useState(false);
+	const [mounted, setMounted] = useState(false);
+
+	useEffect(() => {
+		setMounted(true);
+	}, []);
+
+	const openModal = (fmt: "csv" | "excel" | "pdf" | "print") => {
+		setFormat(fmt);
+		const currentUrlFrom = searchParams.get("from");
+		const currentUrlTo = searchParams.get("to");
+		if (fmt === "pdf" || fmt === "print") {
+			const t1 = getDefaultTMinus1MonthRange();
+			setFrom(currentUrlFrom || t1.from);
+			setTo(currentUrlTo || t1.to);
+		} else {
+			setFrom(currentUrlFrom || defaultFrom);
+			setTo(currentUrlTo || defaultTo);
+		}
+		setIsOpen(true);
+	};
+
+	const handleDownload = async () => {
+		setIsDownloading(true);
+		const params = new URLSearchParams();
+		params.set("mrId", mrId);
+		params.set("division", division);
+		if (from) params.set("from", from);
+		if (to) params.set("to", to);
+		if (party) params.set("party", party);
+
+		if (format === "pdf" || format === "print") {
+			params.set("format", "json");
+			try {
+				const res = await fetch(
+					`/api/reports/download-outstanding?${params.toString()}`,
+				);
+				if (!res.ok) throw new Error("Failed to fetch data");
+				const serverDateStr = res.headers.get("date") || undefined;
+				const data = await res.json();
+
+				// Filter by party if specified
+				const filteredData = party
+					? data.filter(
+							(row: any) =>
+								(row["Customer / Party"] || row["Doctor / Party"]) === party,
+						)
+					: data;
+
+				const mrName = data.length > 0 ? data[0]["MR Name"] : "Unknown";
+				const safeMrName = mrName.replace(/[^a-zA-Z0-9]/g, "_");
+				const safeDivision = division.replace(/[^a-zA-Z0-9]/g, "_");
+				const dateRangeTag =
+					from && to
+						? `${from}_to_${to}`
+						: new Date().toISOString().split("T")[0];
+
+				// Format data for the PDF
+				const cleanDataForPdf = filteredData.map((row: any) => {
+					return {
+						Company:
+							row["Company"] ||
+							row["Company Code"] ||
+							row["Division"] ||
+							division ||
+							"Unknown",
+						Division:
+							row["Division"] ||
+							row["Company Code"] ||
+							division ||
+							"General",
+						Manufacturer:
+							row["Company Code"] || row["Division"] || division || "Unknown",
+						"Doctor / Party":
+							row["Customer / Party"] || row["Doctor / Party"] || "Unknown",
+						City: row["City"] || "Unknown",
+						"Invoice No": row["Bill No"] || row["Invoice No"] || "N/A",
+						"Invoice Date": row["Bill Date"] || row["Invoice Date"] || "N/A",
+						"Amount Due": Number(
+							row["Balance Amount"] ??
+								row["Amount Due"] ??
+								row["Bill Amount"] ??
+								0,
+						),
+						"Overdue Days": Number(
+							row["Purchase Days"] ?? row["Overdue Days"] ?? 0,
+						),
+					};
+				});
+
+				const columns = [
+					{ header: "Doctor / Party", dataKey: "Doctor / Party" },
+					{ header: "City", dataKey: "City" },
+					{ header: "Invoice No", dataKey: "Invoice No" },
+					{ header: "Invoice Date", dataKey: "Invoice Date" },
+					{
+						header: "Amount Due",
+						dataKey: "Amount Due",
+						halign: "right" as const,
+					},
+					{
+						header: "Overdue Days",
+						dataKey: "Overdue Days",
+						halign: "right" as const,
+					},
+				];
+
+				await generateGroupedPdfReport(
+					`Party Wise Outstanding Statement`,
+					`${safeMrName}_${safeDivision}_Outstanding_${dateRangeTag}.pdf`,
+					cleanDataForPdf,
+					columns as any,
+					format === "print" ? "print" : "download",
+					mrName,
+					from,
+					to,
+					serverDateStr,
+				);
+			} catch (e) {
+				console.error(e);
+				alert("Failed to generate PDF");
+			}
+		} else {
+			params.set("format", format);
+			window.location.href = `/api/reports/download-outstanding?${params.toString()}`;
+		}
+
+		setIsDownloading(false);
+		setIsOpen(false);
+	};
+
+	return (
+		<>
+			<div className="flex flex-wrap gap-2">
+				<button
+					className="flex h-[36px] items-center justify-center gap-1.5 rounded-xl border border-[#BAE6FD] bg-[#E0F2FE] px-3 py-2 font-bold text-[#0071BC] text-xs transition hover:bg-[#BAE6FD]"
+					onClick={() => openModal("csv")}
+					title="Download Outstanding Invoices (CSV)"
+				>
+					<svg
+						className="h-3.5 w-3.5"
+						fill="none"
+						stroke="currentColor"
+						viewBox="0 0 24 24"
+						xmlns="http://www.w3.org/2000/svg"
+					>
+						<path
+							d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							strokeWidth="2"
+						></path>
+					</svg>
+					CSV
+				</button>
+				<button
+					className="flex h-[36px] items-center justify-center gap-1.5 rounded-xl bg-[#0071BC] px-3 py-2 font-bold text-white text-xs shadow-sm transition hover:bg-[#134074]"
+					onClick={() => openModal("excel")}
+					title="Download Outstanding Invoices (Excel)"
+				>
+					<svg
+						className="h-3.5 w-3.5"
+						fill="none"
+						stroke="currentColor"
+						viewBox="0 0 24 24"
+						xmlns="http://www.w3.org/2000/svg"
+					>
+						<path
+							d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							strokeWidth="2"
+						></path>
+					</svg>
+					Excel
+				</button>
+				<button
+					className="flex h-[36px] items-center justify-center gap-1.5 rounded-xl bg-[#0B2545] px-3 py-2 font-bold text-white text-xs shadow-sm transition hover:bg-[#1E293B]"
+					onClick={() => openModal("pdf")}
+					title="Download Outstanding Invoices (PDF)"
+				>
+					<svg
+						className="h-3.5 w-3.5"
+						fill="none"
+						stroke="currentColor"
+						viewBox="0 0 24 24"
+						xmlns="http://www.w3.org/2000/svg"
+					>
+						<path
+							d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							strokeWidth="2"
+						></path>
+					</svg>
+					PDF
+				</button>
+
+				<button
+					className="flex h-[36px] items-center justify-center gap-1.5 rounded-xl border border-gray-300 bg-white px-3 py-2 font-bold text-gray-700 text-xs transition hover:bg-gray-50"
+					onClick={() => openModal("print")}
+					title="Print Outstanding Invoices"
+				>
+					<svg
+						className="h-3.5 w-3.5"
+						fill="none"
+						stroke="currentColor"
+						viewBox="0 0 24 24"
+						xmlns="http://www.w3.org/2000/svg"
+					>
+						<path
+							d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							strokeWidth="2"
+						></path>
+					</svg>
+					Print
+				</button>
+			</div>
+
+			{/* Prompt Dialog Window via Portal */}
+			{isOpen &&
+				mounted &&
+				createPortal(
+					<div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+						{/* Dark Full-Screen Backdrop with Real Blur */}
+						<div
+							className="fixed inset-0 bg-black/60 backdrop-blur-md transition-opacity duration-200"
+							onClick={() => setIsOpen(false)}
+						/>
+
+						{/* Centered Modal Card */}
+						<div className="fade-in zoom-in-95 relative z-10 w-full max-w-sm animate-in rounded-2xl border border-gray-200/80 bg-white p-6 shadow-2xl duration-200">
+							<h3 className="mb-2 font-extrabold text-[#0B2545] text-xl">
+								Download Outstanding {format.toUpperCase()}
+							</h3>
+							<p className="mb-6 font-medium text-gray-500 text-sm">
+								Select the date range for your report. Leave blank to download all
+								available invoices.
+							</p>
+
+							<div className="space-y-4">
+								<div>
+									<label className="mb-2 block font-bold text-[#0B2545] text-sm">
+										From Invoice Date
+									</label>
+									<input
+										className="w-full rounded-xl border-2 border-gray-300 bg-white px-4 py-2.5 font-medium text-[#0B2545] text-base outline-none transition-colors focus:border-[#0071BC]"
+										onChange={(e) => setFrom(e.target.value)}
+										type="date"
+										value={from}
+									/>
+								</div>
+								<div>
+									<label className="mb-2 block font-bold text-[#0B2545] text-sm">
+										To Invoice Date
+									</label>
+									<input
+										className="w-full rounded-xl border-2 border-gray-300 bg-white px-4 py-2.5 font-medium text-[#0B2545] text-base outline-none transition-colors focus:border-[#0071BC]"
+										onChange={(e) => setTo(e.target.value)}
+										type="date"
+										value={to}
+									/>
+								</div>
+							</div>
+
+							<div className="mt-8 flex gap-3">
+								<button
+									className="flex-1 rounded-xl border-2 border-gray-300 bg-white px-4 py-2.5 font-bold text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-50"
+									disabled={isDownloading}
+									onClick={() => setIsOpen(false)}
+								>
+									Cancel
+								</button>
+								<button
+									className="flex flex-1 items-center justify-center rounded-xl bg-[#0071BC] px-4 py-2.5 font-bold text-white shadow-sm transition-colors hover:bg-[#134074] disabled:opacity-50"
+									disabled={isDownloading}
+									onClick={handleDownload}
+								>
+									{isDownloading ? "..." : "Confirm"}
+								</button>
+							</div>
+						</div>
+					</div>,
+					document.body,
+				)}
+		</>
+	);
+}
