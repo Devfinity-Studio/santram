@@ -28,8 +28,8 @@ Implement an enterprise-grade Developer Control Center and full-fledged Develope
     - `expiresAt`: ISO Date string (default 1 year from current: `2027-03-31`)
     - `killswitchActive`: boolean
     - `gracePeriodDays`: number (default 7 days)
-    - `organization`: "Asmee Pharma Pvt. Ltd."
-    - `developerEmail`: "dev@asmeepharma.com"
+    - `organization`: "Santram Pharma Pvt. Ltd."
+    - `developerEmail`: "dev@Santrampharma.com"
     - `supportEmail`: "support@devfinity.net"
   - Functions:
     - `getLicenseStatus()`: Computes status, days remaining, and whether access is blocked.

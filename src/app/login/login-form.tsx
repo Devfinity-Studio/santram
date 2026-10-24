@@ -261,7 +261,7 @@ export function LoginForm() {
 							Call Accounts Desk (+91 96241 05404)
 						</a>
 						<a
-							href={`mailto:admin@asmeepharma.com?subject=Account%20Reactivation%20Request%20-%20${encodeURIComponent(blockedInfo.mrName || email)}`}
+							href={`mailto:admin@Santrampharma.com?subject=Account%20Reactivation%20Request%20-%20${encodeURIComponent(blockedInfo.mrName || email)}`}
 							className="flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 font-semibold text-gray-700 text-xs shadow-sm hover:bg-gray-50 transition-colors"
 						>
 							<Mail className="h-3.5 w-3.5 text-gray-500" />
@@ -294,11 +294,10 @@ export function LoginForm() {
 			{/* Mode Toggle Tabs */}
 			<div className="mb-6 grid grid-cols-2 gap-2 rounded-xl bg-gray-100 p-1">
 				<button
-					className={`flex items-center justify-center gap-2 rounded-lg py-2.5 font-bold text-xs transition-all ${
-						mode === "mr"
+					className={`flex items-center justify-center gap-2 rounded-lg py-2.5 font-bold text-xs transition-all ${mode === "mr"
 							? "bg-[#0071BC] text-white shadow-sm"
 							: "text-gray-600 hover:text-gray-900"
-					}`}
+						}`}
 					onClick={() => {
 						setMode("mr");
 						setStep("request");
@@ -311,11 +310,10 @@ export function LoginForm() {
 					MR Email OTP
 				</button>
 				<button
-					className={`flex items-center justify-center gap-2 rounded-lg py-2.5 font-bold text-xs transition-all ${
-						mode === "admin"
+					className={`flex items-center justify-center gap-2 rounded-lg py-2.5 font-bold text-xs transition-all ${mode === "admin"
 							? "bg-[#0B2545] text-white shadow-sm"
 							: "text-gray-600 hover:text-gray-900"
-					}`}
+						}`}
 					onClick={() => {
 						setMode("admin");
 						setError("");
@@ -342,7 +340,7 @@ export function LoginForm() {
 							<input
 								className="block w-full rounded-lg border border-gray-300 px-3.5 py-2.5 text-gray-900 shadow-sm focus:border-[#0071BC] focus:ring-[#0071BC] sm:text-sm"
 								onChange={(e) => setEmail(e.target.value)}
-								placeholder="mr.name@asmeepharma.com"
+								placeholder="mr.name@Santrampharma.com"
 								required
 								type="email"
 								value={email}
@@ -426,7 +424,7 @@ export function LoginForm() {
 							<input
 								className="block w-full rounded-lg border border-gray-300 px-3.5 py-2.5 text-gray-900 shadow-sm focus:border-[#0B2545] focus:ring-[#0B2545] sm:text-sm"
 								onChange={(e) => setEmail(e.target.value)}
-								placeholder="admin@asmeepharma.com or dev email"
+								placeholder="admin@Santrampharma.com or dev email"
 								required
 								type="email"
 								value={email}

@@ -149,7 +149,7 @@
 
 ## Phase 21: PDF and Report Polishing [COMPLETED]
 
-- [x] **Web View Stationery Headers**: Replicate the official stationery header from the Party Wise tab across all report tabs (`Stock`, `Sales`, `Product Wise`, `Free Scheme`, `Overdue`) with Asmee Pharma logo, full address, contact details, year, and dynamic title/subtitle metadata.
+- [x] **Web View Stationery Headers**: Replicate the official stationery header from the Party Wise tab across all report tabs (`Stock`, `Sales`, `Product Wise`, `Free Scheme`, `Overdue`) with Santram Pharma logo, full address, contact details, year, and dynamic title/subtitle metadata.
 - [x] **Comprehensive PDF Generation for All Tabs**: Verify and ensure flawless PDF generation across every tab (`Stock`, `Party Wise`, `Product Wise`, `Sales`, `Free Scheme`, `Overdue`), producing exact high-fidelity replicas of the web view with matching typography, group banners, subtotals, and grand totals.
 - [x] **Party Wise PDF Generation & Button Styling**: Fix the red PDF button on Party Wise tab to match standard UI theme, and implement full `generatePartyWisePdfReport` to generate an exact replica of the Party Wise web report.
 - [x] **Product Wise PDF Generation**: Align Product Wise PDF export structure and data columns with the exact web view table (Item Code, Item Name, Batch, Exp, Qty, Rate, Amount).

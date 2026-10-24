@@ -6,7 +6,7 @@ import { getRecentAuditLogs } from "@/lib/audit-logger";
 import { auth } from "@/server/auth";
 
 export const metadata = {
-	title: "Security & Audit Logs | Admin Panel | Asmee Pharma",
+	title: "Security & Audit Logs | Admin Panel | Santram Pharma",
 };
 
 export const dynamic = "force-dynamic";

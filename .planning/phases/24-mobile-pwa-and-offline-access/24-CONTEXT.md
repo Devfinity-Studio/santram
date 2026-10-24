@@ -7,7 +7,7 @@ Transform PharmaQL into an installable, high-performance Progressive Web Applica
 
 ## 1. PWA Foundation & App Shell Installation
 - **Web App Manifest (`src/app/manifest.ts` / Next.js Metadata)**:
-  - Name: `PharmaQL | Asmee Pharma MR Portal`
+  - Name: `PharmaQL | Santram Pharma MR Portal`
   - Short Name: `PharmaQL`
   - Theme Color: `#0071BC`
   - Background Color: `#0B2545`

@@ -66,7 +66,7 @@ async function assertDeveloperSession(customHeaders?: Headers) {
 				user: {
 					id: "dev-local",
 					name: "Local Developer",
-					email: "dev@asmeepharma.com",
+					email: "dev@Santrampharma.com",
 					role: "DEVELOPER" as const,
 				},
 				session: {
@@ -705,7 +705,7 @@ export async function sendTestEmailAction({
 			</div>
 		`;
 	} else if (template === "SUBSCRIPTION_PREVIEW") {
-		subject = `[Test Preview] PharmaQL Software License Renewal Reminder — Asmee Pharma`;
+		subject = `[Test Preview] PharmaQL Software License Renewal Reminder — Santram Pharma`;
 		html = `
 			<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff;">
 				<h2 style="color: #0B2545;">License Renewal Diagnostics Test</h2>

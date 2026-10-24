@@ -31,7 +31,7 @@ const LEGACY_MKT_MR_QUERY = `
 function normalizeLegacyMR(raw: any) {
   const isBlocked = Number(raw.IsInActive ?? raw.IsBlocked ?? 0) === 1;
   const name = (raw.MRName || raw.Description || raw.UCode || "MR User").toString().trim();
-  const email = (raw.EmailId || `${raw.ID}@asmeepharma.com`).toString().trim();
+  const email = (raw.EmailId || `${raw.ID}@Santrampharma.com`).toString().trim();
   const division = raw.DivisionName ? String(raw.DivisionName).trim() : undefined;
   const company = raw.CompanyName || raw.CompanyCode ? String(raw.CompanyName || raw.CompanyCode).trim() : undefined;
   const companyCode = raw.CompanyCode ? String(raw.CompanyCode).trim() : undefined;
@@ -123,7 +123,7 @@ masterRouter.get("/mr-info/:id", async (req: Request, res: Response) => {
       const primary = results[0];
       const name = (primary.MRName || "").trim();
       const email = (primary.EmailId || "").trim();
-      const isSynth = !email || email.toLowerCase().includes("@asmeepharma.com");
+      const isSynth = !email || email.toLowerCase().includes("@Santrampharma.com");
 
       // Query all matching division rows for this MR
       const matchQuery = !isSynth

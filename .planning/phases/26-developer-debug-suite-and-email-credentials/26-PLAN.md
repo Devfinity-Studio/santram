@@ -54,7 +54,7 @@ flowchart TD
     - If present, creates/caches a dedicated nodemailer transporter configured with developer credentials (supports Gmail service or custom `DEV_SMTP_HOST` / `DEV_SMTP_PORT`).
     - If absent, gracefully falls back to primary `mailer` instance.
   - Implement `sendDeveloperEmail({ to, subject, html, text })`:
-    - Sets `from` header to `"${organization || 'PharmaQL'} Developer" <${process.env.DEV_EMAIL || process.env.DEV_SMTP_USER || 'dev@asmeepharma.com'}>`.
+    - Sets `from` header to `"${organization || 'PharmaQL'} Developer" <${process.env.DEV_EMAIL || process.env.DEV_SMTP_USER || 'dev@Santrampharma.com'}>`.
     - Dispatches using the developer transporter.
   - Implement `verifyMailerConnection(type: "ADMIN" | "DEVELOPER")`:
     - Runs `transporter.verify()` and returns `{ success: boolean; latencyMs: number; error?: string }`.

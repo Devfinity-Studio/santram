@@ -59,7 +59,7 @@ PharmaQL operates on a **decoupled, multi-tier enterprise architecture** designe
 ## 3. Core Domain & Business Rule Engines
 
 ### 1. Overdue & Cascading Blocking Engine (`src/server/actions/overdueEngine.ts`)
-A critical business requirement for Asmee Pharma: field representatives are held accountable for overdue client invoice payments.
+A critical business requirement for Santram Pharma: field representatives are held accountable for overdue client invoice payments.
 - **Evaluation States:**
   - `CLEAN`: No outstanding invoices exceeding payment thresholds.
   - `WARNING` (80–90 days overdue): Banner notifications and impending block modals alert the MR to follow up on collection.

@@ -24,7 +24,7 @@ export function ReportStationeryHeader({
 				<div className="flex items-start gap-4">
 					<div className="flex-shrink-0">
 						<Image
-							alt="Asmee Pharma Logo"
+							alt="Santram Pharma Logo"
 							className="object-contain pt-0.5"
 							height={45}
 							priority
@@ -34,14 +34,14 @@ export function ReportStationeryHeader({
 					</div>
 					<div>
 						<h1 className="font-extrabold text-base text-gray-900 uppercase tracking-tight">
-							ASMEE PHARMA PRIVATE LIMITED
+							Santram PHARMA PRIVATE LIMITED
 						</h1>
 						<p className="mt-0.5 text-[11px] text-gray-700 leading-tight">
 							BASEMENT-GF, 11/2 ASHOK HOUSE, B/S SANSTHA VASAHAT GATE,, PRATAP ROAD,
 							<br />
 							RAOPURA, VADODARA - 390001, GUJARAT - 24
 							<br />
-							Contact: 9409789800, 9409789700 Mobile: 9409789700 Email: asmeepharma2022@gmail.com
+							Contact: 9409789800, 9409789700 Mobile: 9409789700 Email: Santrampharma2022@gmail.com
 						</p>
 					</div>
 				</div>

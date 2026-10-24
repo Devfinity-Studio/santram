@@ -24,7 +24,7 @@ export function isDeveloperMailerConfigured(): boolean {
  * Get active developer sender email address.
  */
 export function getDeveloperSenderEmail(): string {
-	return process.env.DEV_EMAIL || process.env.DEV_SMTP_USER || "dev@asmeepharma.com";
+	return process.env.DEV_EMAIL || process.env.DEV_SMTP_USER || "dev@Santrampharma.com";
 }
 
 /**
@@ -114,13 +114,13 @@ export async function sendDeveloperEmail({
  */
 export async function sendOtpEmail(to: string, otp: string, mrName?: string) {
 	const mailOptions = {
-		from: `"Asmee Pharma Portal" <${process.env.GMAIL_USER || "info.devolvestudio@gmail.com"}>`,
+		from: `"Santram Pharma Portal" <${process.env.GMAIL_USER || "info.devolvestudio@gmail.com"}>`,
 		to,
 		subject: `Your PharmaQL Login OTP: ${otp}`,
 		html: `
 			<div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff;">
 				<div style="text-align: center; margin-bottom: 20px;">
-					<h2 style="color: #0B2545; margin: 0; font-size: 22px;">Asmee Pharma Portal</h2>
+					<h2 style="color: #0B2545; margin: 0; font-size: 22px;">Santram Pharma Portal</h2>
 					<p style="color: #64748b; font-size: 13px; margin-top: 4px;">PharmaQL Medical Representative Verification</p>
 				</div>
 				<p style="color: #334155; font-size: 15px; margin-bottom: 12px;">Hello <strong>${mrName || "Medical Representative"}</strong>,</p>

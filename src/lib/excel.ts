@@ -34,7 +34,7 @@ export async function buildStyledExcelBuffer(options: {
 	} = options;
 
 	const workbook = new ExcelJS.Workbook();
-	workbook.creator = "Asmee Pharma - PharmaQL";
+	workbook.creator = "Santram Pharma - PharmaQL";
 	workbook.created = new Date();
 
 	const worksheet = workbook.addWorksheet(sheetName, {
@@ -45,7 +45,7 @@ export async function buildStyledExcelBuffer(options: {
 
 	// 1. Company Letterhead
 	const companyRow = worksheet.getRow(rowIndex++);
-	companyRow.getCell(1).value = "ASMEE PHARMA PRIVATE LIMITED";
+	companyRow.getCell(1).value = "Santram PHARMA PRIVATE LIMITED";
 	companyRow.getCell(1).font = { name: "Calibri", size: 14, bold: true, color: { argb: "0B2545" } };
 
 	const addressRow = worksheet.getRow(rowIndex++);
@@ -55,7 +55,7 @@ export async function buildStyledExcelBuffer(options: {
 
 	const contactRow = worksheet.getRow(rowIndex++);
 	contactRow.getCell(1).value =
-		"Contact: 9409789800, 9409789700 | Email: asmeepharma2022@gmail.com";
+		"Contact: 9409789800, 9409789700 | Email: Santrampharma2022@gmail.com";
 	contactRow.getCell(1).font = { name: "Calibri", size: 9, italic: true, color: { argb: "555555" } };
 
 	rowIndex++; // blank separator

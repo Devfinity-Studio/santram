@@ -18,7 +18,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-	title: "Asmee Pharma Pvt. Ltd. | PharmaQL",
+	title: "Santram Pharma Pvt. Ltd. | PharmaQL",
 	description:
 		"The Modern Medicine Portal empowering medical representatives and distributors with real-time insights, effortless ordering and intelligent inventory tracking.",
 	authors: [{ name: "Devfinity" }],
