@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-11  
 **Status:** Approved Architectural Decision — **Solution B (Stateless JWT + Legacy MySQL Read-Only Mapping + JSON)**  
-**Constraint:** Strict prohibition against creating new tables or altering schemas in MySQL (`pdyasvmaster` and `pdyasvtrans`).
+**Constraint:** Strict prohibition against creating new tables or altering schemas in MySQL (`pdyspvmaster` and `pdyspvtrans`).
 
 ---
 
@@ -18,18 +18,18 @@ The project has chosen **Solution B** to eliminate Neon completely **without cre
    - Session revocation / expiration is handled purely via cookie expiry and signing key rotation.
 2. **User & MR Read-Only Mapping:**
    - On login, MR credentials and profile details are read directly from existing legacy tables:
-     - `pdyasvmaster.l_mktcompany_mr` (MR profile: `ID`, `MRName`, `EmailId`, `MobileNo`, `IsInActive`)
-     - `pdyasvmaster.l_mktcompany` (Division: `ID`, `Division`, `CompCode`)
-     - `pdyasvmaster.m_mktcompany` (Company: `Code`, `Description`)
-     - `pdyasvmaster.m_user` (ERP internal user logins)
+     - `pdyspvmaster.l_mktcompany_mr` (MR profile: `ID`, `MRName`, `EmailId`, `MobileNo`, `IsInActive`)
+     - `pdyspvmaster.l_mktcompany` (Division: `ID`, `Division`, `CompCode`)
+     - `pdyspvmaster.m_mktcompany` (Company: `Code`, `Description`)
+     - `pdyspvmaster.m_user` (ERP internal user logins)
    - Zero custom tables created for users or MR manufacturer mappings.
 3. **Reports & Exports:**
    - 100% powered by the 5 legacy stored procedures in MySQL:
-     - Product Wise: `pdyasvtrans.rptItemCustomerSale`
-     - Party Wise: `pdyasvtrans.rptCompanyCustomerItemwiseSales`
-     - Stock & Sales: `pdyasvtrans.rptStockMovementStatement`
-     - Claim Qty: `pdyasvtrans.rptClaimData`
-     - Overdue Statement: `pdyasvtrans.rptMRwisePeriodicalOutstanding`
+     - Product Wise: `pdyspvtrans.rptItemCustomerSale`
+     - Party Wise: `pdyspvtrans.rptCompanyCustomerItemwiseSales`
+     - Stock & Sales: `pdyspvtrans.rptStockMovementStatement`
+     - Claim Qty: `pdyspvtrans.rptClaimData`
+     - Overdue Statement: `pdyspvtrans.rptMRwisePeriodicalOutstanding`
 4. **Notices / Announcements:**
    - Broadcast admin notices are persisted in a lightweight JSON file (`data/notices.json`) on the server.
    - Zero tables created in MySQL.
@@ -42,8 +42,8 @@ Below is the complete inventory of all read queries hitting Neon Postgres via Dr
 
 | # | Location / File | Postgres Table | Purpose / Query Details | Legacy MySQL Replacement |
 |---|---|---|---|---|
-| 1 | `src/components/mr-dashboard-content.tsx` (L56) | `mrManufacturers` | Reads MR's assigned companies/divisions. | Read from `pdyasvmaster.l_mktcompany_mr` + `l_mktcompany` + `m_mktcompany` |
-| 2 | `src/components/mr-dashboard-content.tsx` (L116) | `products` | Reads products in assigned divisions. | Stored procedure output / `pdyasvmaster.m_item` |
+| 1 | `src/components/mr-dashboard-content.tsx` (L56) | `mrManufacturers` | Reads MR's assigned companies/divisions. | Read from `pdyspvmaster.l_mktcompany_mr` + `l_mktcompany` + `m_mktcompany` |
+| 2 | `src/components/mr-dashboard-content.tsx` (L116) | `products` | Reads products in assigned divisions. | Stored procedure output / `pdyspvmaster.m_item` |
 | 3 | `src/components/mr-dashboard-content.tsx` (L149) | `mrInventory` | Reads inventory stock per product for the MR. | Stored procedure `rptStockMovementStatement` |
 | 4 | `src/components/mr-dashboard-content.tsx` (L222) | `sales` | Reads sales transactions for Overview metric cards. | Stored procedure `rptItemCustomerSale` aggregation |
 | 5 | `src/components/mr-dashboard-content.tsx` (L228) | `invoices` | Reads invoice records for Overview metric cards. | Stored procedure `rptMRwisePeriodicalOutstanding` |
@@ -60,10 +60,10 @@ Below is the complete inventory of all read queries hitting Neon Postgres via Dr
 | 16 | `src/app/api/reports/download-sales/route.ts` (L60) | `mrManufacturers`, `sales`, `products` | Generates Sales Excel export. | Switch to `rptItemCustomerSale` |
 | 17 | `src/app/api/reports/download-outstanding/route.ts` (L78) | `mrManufacturers`, `outstanding` | Generates Outstanding Excel export. | Switch to `rptMRwisePeriodicalOutstanding` |
 | 18 | `src/app/api/reports/download/route.ts` (L120) | `sales`, `outstanding`, `mrInventory` | Multi-report download endpoint. | Switch to live stored procedures |
-| 19 | `src/app/api/products/route.ts` (L19) | `companies`, `products` | Product listing API. | Switch to `pdyasvmaster.m_item` |
-| 20 | `src/app/products/[company]/page.tsx` (L19) | `products` | Company products page. | Switch to `pdyasvmaster.m_item` |
-| 21 | `src/app/admin/mrs/page.tsx` (L36) | `user`, `mrManufacturers`, `session` | Admin MR listing and permission management. | Query `pdyasvmaster.l_mktcompany_mr` |
-| 22 | `src/app/admin/companies/page.tsx` (L33) | `companies` | Admin companies list. | Query `pdyasvmaster.m_mktcompany` |
+| 19 | `src/app/api/products/route.ts` (L19) | `companies`, `products` | Product listing API. | Switch to `pdyspvmaster.m_item` |
+| 20 | `src/app/products/[company]/page.tsx` (L19) | `products` | Company products page. | Switch to `pdyspvmaster.m_item` |
+| 21 | `src/app/admin/mrs/page.tsx` (L36) | `user`, `mrManufacturers`, `session` | Admin MR listing and permission management. | Query `pdyspvmaster.l_mktcompany_mr` |
+| 22 | `src/app/admin/companies/page.tsx` (L33) | `companies` | Admin companies list. | Query `pdyspvmaster.m_mktcompany` |
 | 23 | `src/app/admin/notices/page.tsx` (L20) | `notices` | Admin notices page. | Read from `data/notices.json` |
 | 24 | `src/server/auth.ts` | `user`, `session`, `account`, `verification` | Better Auth session verification & user lookup. | Stateless JWT token verification (Zero DB lookups) |
 

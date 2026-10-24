@@ -7,11 +7,11 @@
 ## Context & Background
 
 During troubleshooting, 5 core reports were connected to MySQL stored procedures:
-1. **Product Wise Sales:** `pdyasvtrans.rptItemCustomerSale`
-2. **Party Wise Sales:** `pdyasvtrans.rptCompanyCustomerItemwiseSales`
-3. **Stock & Sales Statement:** `pdyasvtrans.rptStockMovementStatement`
-4. **Claim Qty:** `pdyasvtrans.rptSaleFreeQtyStatement` & `rptClaimData`
-5. **Overdue & Periodical Outstanding:** `pdyasvtrans.rptMRwisePeriodicalOutstanding`
+1. **Product Wise Sales:** `pdyspvtrans.rptItemCustomerSale`
+2. **Party Wise Sales:** `pdyspvtrans.rptCompanyCustomerItemwiseSales`
+3. **Stock & Sales Statement:** `pdyspvtrans.rptStockMovementStatement`
+4. **Claim Qty:** `pdyspvtrans.rptSaleFreeQtyStatement` & `rptClaimData`
+5. **Overdue & Periodical Outstanding:** `pdyspvtrans.rptMRwisePeriodicalOutstanding`
 
 Additionally:
 - Full company names (e.g., `"STARTOS HEALTHCARE PVT LTD"`) are standardized using `formatCompanyCodeParam` to pass only first words (`"STARTOS"`).

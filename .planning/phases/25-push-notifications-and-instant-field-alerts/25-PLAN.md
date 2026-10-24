@@ -211,4 +211,4 @@ flowchart TD
   - `pnpm exec tsc --noEmit` exits 0.
   - `scratch/test-phase24-pwa.ts` exits 0.
   - `pnpm run build` exits 0.
-  - Confirm 0 writes to legacy MySQL ERP database (`pdyasvmaster`).
+  - Confirm 0 writes to legacy MySQL ERP database (`pdyspvmaster`).

@@ -25,13 +25,13 @@
 | **Postgres Table** | `user` |
 | **Postgres Columns** | `id`, `name`, `email`, `emailVerified`, `image`, `role` ("ADMIN" / "MR"), `isBlocked`, `canViewFreeScheme`, `canViewStock`, `canViewSales`, `canViewPartyWise`, `canViewProductWise`, `locNo`, `rank`, `createdAt`, `updatedAt` |
 | **Current PharmaQL Reads** | Login credential check, MR profile display on dashboard, Admin MR list (`/admin/mrs`). |
-| **Proposed MySQL Source** | `pdyasvmaster.l_mktcompany_mr` (MRs) & `pdyasvmaster.m_user` (ERP system users). |
+| **Proposed MySQL Source** | `pdyspvmaster.l_mktcompany_mr` (MRs) & `pdyspvmaster.m_user` (ERP system users). |
 
 #### ❓ Doubts / Questions for You:
 1. **Password Authentication:** How do MRs authenticate against the legacy ERP?
-   - Does `pdyasvmaster.m_user` or `pdyasvmaster.l_mktcompany_mr` have a password column (e.g. `UPassword`, `Password`, `PWD`), and is it plain text or hashed?
+   - Does `pdyspvmaster.m_user` or `pdyspvmaster.l_mktcompany_mr` have a password column (e.g. `UPassword`, `Password`, `PWD`), and is it plain text or hashed?
    - Or do MRs log in with their Mobile Number / Email ID via OTP?
-2. **Admin Account:** Are Admin users defined in `pdyasvmaster.m_user` (if so, which column distinguishes an Admin?), or should Admin credentials be defined via environment variables (`ADMIN_EMAIL`, `ADMIN_PASSWORD`)?
+2. **Admin Account:** Are Admin users defined in `pdyspvmaster.m_user` (if so, which column distinguishes an Admin?), or should Admin credentials be defined via environment variables (`ADMIN_EMAIL`, `ADMIN_PASSWORD`)?
 3. **Permissions:** Does the legacy ERP have permission columns for `canViewStock`, `canViewSales`, etc., or should all active MRs have view permissions enabled by default?
 
 ---
@@ -67,9 +67,9 @@ SELECT
   l.Division AS DivisionName,
   m.Code AS CompanyCode,
   m.Description AS CompanyName
-FROM `pdyasvmaster`.`l_mktcompany_mr` mr
-LEFT JOIN `pdyasvmaster`.`l_mktcompany` l ON mr.DivisionID = l.ID
-LEFT JOIN `pdyasvmaster`.`m_mktcompany` m ON l.CompCode = m.Code
+FROM `pdyspvmaster`.`l_mktcompany_mr` mr
+LEFT JOIN `pdyspvmaster`.`l_mktcompany` l ON mr.DivisionID = l.ID
+LEFT JOIN `pdyspvmaster`.`m_mktcompany` m ON l.CompCode = m.Code
 WHERE mr.ID = ?
 ```
 
@@ -88,10 +88,10 @@ no a single MR can have multiple assignments but the table is the only source of
 | **Postgres Table** | `company` (`companies`) |
 | **Postgres Columns** | `name` (PK), `isActive`, `createdAt`, `updatedAt` |
 | **Current PharmaQL Reads** | Company dropdown filters, `/admin/companies`, `/api/products`. |
-| **Proposed MySQL Source** | `pdyasvmaster.m_mktcompany` (`Code`, `Description`, `IsInActive`). |
+| **Proposed MySQL Source** | `pdyspvmaster.m_mktcompany` (`Code`, `Description`, `IsInActive`). |
 
 #### ❓ Doubts / Questions for You:
-- In `pdyasvmaster.m_mktcompany`, is `Code` (e.g. `'AASPAN'`, `'STARTOS'`) the primary code to use for all report filters, and `Description` for the UI label?
+- In `pdyspvmaster.m_mktcompany`, is `Code` (e.g. `'AASPAN'`, `'STARTOS'`) the primary code to use for all report filters, and `Description` for the UI label?
 
 that is not the code the code is supposed to be the first word of the company string. for e.g. if its XYZ health care the code will be XYZ
 
@@ -104,11 +104,11 @@ that is not the code the code is supposed to be the first word of the company st
 | **Postgres Table** | `product` (`products`) |
 | **Postgres Columns** | `id`, `name`, `freeScheme` (e.g. "10+2"), `manufacturer`, `firmNo`, `code`, `division`, `ingredients` |
 | **Current PharmaQL Reads** | `/products/[company]`, `/api/products`, fallback report views. |
-| **Proposed MySQL Source** | `pdyasvmaster.m_item` or live stored procedures. |
+| **Proposed MySQL Source** | `pdyspvmaster.m_item` or live stored procedures. |
 
 #### ❓ Doubts / Questions for You:
-1. Should product catalog queries read from `pdyasvmaster.m_item`?
-   - What are the exact columns in `pdyasvmaster.m_item` for Item Code, Item Name, Pack, and Company Code? (e.g., `ItemCode`, `ItemName`, `Pack`, `CompCode`?)
+1. Should product catalog queries read from `pdyspvmaster.m_item`?
+   - What are the exact columns in `pdyspvmaster.m_item` for Item Code, Item Name, Pack, and Company Code? (e.g., `ItemCode`, `ItemName`, `Pack`, `CompCode`?)
 2. Where is `freeScheme` (e.g. "10+2" or scheme details) stored in the legacy database, or is it handled solely inside the `rptClaimData` procedure?
 
 
@@ -123,7 +123,7 @@ that is not the code the code is supposed to be the first word of the company st
 | **Postgres Table** | `mr_inventory` (`mrInventory`) |
 | **Postgres Columns** | `id`, `mrId`, `productId`, `stock`, `date`, `opening`, `inward`, `outward`, `ptr`, `mrp`, `prate` |
 | **Current PharmaQL Reads** | Fallback in `stock-report-view.tsx`, `mr-dashboard-content.tsx`, `download-stock/route.ts`. |
-| **Proposed MySQL Source** | **Stored Procedure:** `pdyasvtrans.rptStockMovementStatement` |
+| **Proposed MySQL Source** | **Stored Procedure:** `pdyspvtrans.rptStockMovementStatement` |
 
 #### ❓ Doubts / Questions for You:
 - Can we completely deprecate the `mr_inventory` table and rely 100% on `CALL rptStockMovementStatement(...)` for all stock views and Excel exports?
@@ -138,7 +138,7 @@ yes we have to
 | **Postgres Tables** | `sale`, `invoice` |
 | **Postgres Columns** | `id`, `productId`, `mrId`, `quantity`, `amount`, `freeQty`, `dealer`, `area`, `date`, `invNo`, `invAmt` |
 | **Current PharmaQL Reads** | Fallback in `product-report-view.tsx`, `party-report-view.tsx`, Overview metric cards. |
-| **Proposed MySQL Source** | **Stored Procedures:**<br>• Product Wise: `pdyasvtrans.rptItemCustomerSale`<br>• Party Wise: `pdyasvtrans.rptCompanyCustomerItemwiseSales` |
+| **Proposed MySQL Source** | **Stored Procedures:**<br>• Product Wise: `pdyspvtrans.rptItemCustomerSale`<br>• Party Wise: `pdyspvtrans.rptCompanyCustomerItemwiseSales` |
 
 #### ❓ Doubts / Questions for You:
 - For the Overview Dashboard metric cards ("Total Sales Volume" and "Total Invoices"):
@@ -154,7 +154,7 @@ yes you can also cache them for a day
 | **Postgres Table** | `outstanding` |
 | **Postgres Columns** | `id`, `mrId`, `doctor`, `city`, `invNo`, `invDt`, `invAmt`, `manufacturerCode`, `division` |
 | **Current PharmaQL Reads** | Fallback in `overdue-report-view.tsx`, `download-outstanding/route.ts`, Overview card. |
-| **Proposed MySQL Source** | **Stored Procedure:** `pdyasvtrans.rptMRwisePeriodicalOutstanding` |
+| **Proposed MySQL Source** | **Stored Procedure:** `pdyspvtrans.rptMRwisePeriodicalOutstanding` |
 
 #### ❓ Doubts / Questions for You:
 - Can we confirm that all overdue/outstanding reporting and exports should be sourced strictly from `CALL rptMRwisePeriodicalOutstanding(...)`?
@@ -172,20 +172,20 @@ yes absolutely.
 | **Proposed Solution B** | Lightweight server JSON file (`data/notices.json`). |
 
 #### ❓ Doubts / Questions for You:
-- Does the legacy ERP system already have an internal notice or announcement table in `pdyasvmaster` that we should read from, or is storing broadcast notices in `data/notices.json` the preferred approach?
+- Does the legacy ERP system already have an internal notice or announcement table in `pdyspvmaster` that we should read from, or is storing broadcast notices in `data/notices.json` the preferred approach?
 
 no it doesnt have.
 ---
 
 ## Summary of Input Needed from You:
 Please reply with specifications for:
-1. **MR Authentication:** Which table & column contains MR passwords/credentials in `pdyasvmaster` (e.g., `m_user`), or do you prefer OTP/mobile login? OTP login only. just add the ability to explisitely mention some admin users with email and password hash. the rest is OTP only.
+1. **MR Authentication:** Which table & column contains MR passwords/credentials in `pdyspvmaster` (e.g., `m_user`), or do you prefer OTP/mobile login? OTP login only. just add the ability to explisitely mention some admin users with email and password hash. the rest is OTP only.
 
 add one developer account too. (we will add developer abilites later)
 
 2. **Admin Credentials:** Should admin login check `m_user` or use environment variables (`ADMIN_EMAIL`/`ADMIN_PASSWORD`)? yes mention the admin and developer creds in the env file
-3. **Product Catalog:** What are the exact column names in `pdyasvmaster.m_item` (ItemCode, ItemName, CompCode)? 
+3. **Product Catalog:** What are the exact column names in `pdyspvmaster.m_item` (ItemCode, ItemName, CompCode)? 
 4. **Notices:** Local `data/notices.json` or is there an existing ERP notice table?
 
 this is the item query 
-select `pdyasvmaster`.`m_item`.`ID` AS `ID`,`pdyasvmaster`.`m_item`.`AWACSCode` AS `AWACSCode`,`pdyasvmaster`.`m_item`.`SeriesID` AS `SeriesID`,`pdyasvmaster`.`m_item`.`ItemCode` AS `ItemCode`,`pdyasvmaster`.`m_item`.`ItemName` AS `ItemName`,`pdyasvmaster`.`m_item`.`PrintName` AS `PrintName`,`pdyasvmaster`.`m_item`.`Packing` AS `Packing`,`pdyasvmaster`.`m_item`.`BaseUnit` AS `BaseUnit`,`pdyasvmaster`.`m_item`.`PurcUnit` AS `PurcUnit`,`pdyasvmaster`.`m_item`.`QtyPerPurcUnit` AS `QtyPerPurcUnit`,`pdyasvmaster`.`m_item`.`MktByID` AS `MktByID`,`pdyasvmaster`.`m_item`.`MktBy` AS `MktBy`,`pdyasvmaster`.`m_item`.`MfgByID` AS `MfgByID`,`pdyasvmaster`.`m_item`.`DivisionId` AS `DivisionId`,`pdyasvmaster`.`m_item`.`Division` AS `Division`,`pdyasvmaster`.`m_item`.`AllowInvDisc` AS `AllowInvDisc`,`pdyasvmaster`.`m_item`.`DiscPer` AS `DiscPer`,`pdyasvmaster`.`m_item`.`MinNetQty` AS `MinNetQty`,`pdyasvmaster`.`m_item`.`MultipleOfQty` AS `MultipleOfQty`,`pdyasvmaster`.`m_item`.`MinSaleQty` AS `MinSaleQty`,`pdyasvmaster`.`m_item`.`AllowSLRT` AS `AllowSLRT`,`pdyasvmaster`.`m_item`.`AllowChangePTR` AS `AllowChangePTR`,`pdyasvmaster`.`m_item`.`IncSS` AS `IncSS`,`pdyasvmaster`.`m_item`.`ItemCatgID` AS `ItemCatgID`,`pdyasvmaster`.`m_item`.`ItemCategory` AS `ItemCategory`,`pdyasvmaster`.`m_item`.`IsColdChain` AS `IsColdChain`,`pdyasvmaster`.`m_item`.`ItemGroup` AS `ItemGroup`,`pdyasvmaster`.`m_item`.`MISRate` AS `MISRate`,`pdyasvmaster`.`m_item`.`HSN` AS `HSN`,`pdyasvmaster`.`m_item`.`TaxGrpCode` AS `TaxGrpCode`,`pdyasvmaster`.`m_item`.`GeneralTaxP` AS `GeneralTaxP`,`pdyasvmaster`.`m_item`.`CompNo` AS `CompNo`,`pdyasvmaster`.`m_item`.`Initial` AS `Initial`,`pdyasvmaster`.`m_item`.`Notes` AS `Notes`,`pdyasvmaster`.`m_item`.`Remark` AS `Remark`,`pdyasvmaster`.`m_item`.`ItemUnder` AS `ItemUnder`,`pdyasvmaster`.`m_item`.`shortIname` AS `shortIname`,`pdyasvmaster`.`m_item`.`AllowSALE` AS `AllowSALE`,`pdyasvmaster`.`m_item`.`VendorRefICode` AS `VendorRefICode`,`pdyasvmaster`.`m_item`.`AllowBranchTrans` AS `AllowBranchTrans`,`pdyasvmaster`.`m_item`.`Block` AS `Block`,`pdyasvmaster`.`m_item`.`CNQty` AS `CNQty`,`pdyasvmaster`.`m_item`.`CNFree` AS `CNFree`,`pdyasvmaster`.`m_item`.`CreatedBy` AS `CreatedBy`,`pdyasvmaster`.`m_item`.`CreatedDate` AS `CreatedDate`,`pdyasvmaster`.`m_item`.`EditedBy` AS `EditedBy`,`pdyasvmaster`.`m_item`.`EditedDate` AS `EditedDate`,`pdyasvmaster`.`m_item`.`RowVersion` AS `RowVersion`,`pdyasvmaster`.`m_item`.`PriQty` AS `PriQty`,`pdyasvmaster`.`m_item`.`PriContains` AS `PriContains`,`pdyasvmaster`.`m_item`.`PriContainsUnit` AS `PriContainsUnit`,`pdyasvmaster`.`m_item`.`PerBoxPri` AS `PerBoxPri`,`pdyasvmaster`.`m_item`.`PerTerPri` AS `PerTerPri`,`pdyasvmaster`.`m_item`.`EffectInward` AS `EffectInward`,`pdyasvmaster`.`m_item`.`LBatchNo` AS `LBatchNo`,`pdyasvmaster`.`m_item`.`LPrate` AS `LPrate`,`pdyasvmaster`.`m_item`.`LPTR` AS `LPTR`,`pdyasvmaster`.`m_item`.`LMRP` AS `LMRP`,`pdyasvmaster`.`m_item`.`LExpDt` AS `LExpDt`,`pdyasvmaster`.`m_item`.`PTRMarginP` AS `PTRMarginP`,`pdyasvmaster`.`m_item`.`PRateMarginP` AS `PRateMarginP`,`pdyasvmaster`.`m_item`.`InActive` AS `InActive`,`pdyasvmaster`.`m_item`.`IsUpdated` AS `IsUpdated`,`pdyasvmaster`.`m_item`.`DropPTR` AS `DropPTR`,`pdyasvmaster`.`m_item`.`ItemMainCategory` AS `ItemMainCategory`,`pdyasvmaster`.`m_item`.`ItemSubCategory` AS `ItemSubCategory`,`pdyasvmaster`.`m_item`.`LMfgBy` AS `LMfgBy`,`pdyasvmaster`.`m_item`.`AllowExpiry` AS `AllowExpiry`,`pdyasvmaster`.`m_item`.`OldTaxGrpCode` AS `OldTaxGrpCode`,`pdyasvmaster`.`m_item`.`OldLMRP` AS `OldLMRP`,`pdyasvmaster`.`m_item`.`SchMinQty` AS `SchMinQty` from `pdyasvmaster`.`m_item`
+select `pdyspvmaster`.`m_item`.`ID` AS `ID`,`pdyspvmaster`.`m_item`.`AWACSCode` AS `AWACSCode`,`pdyspvmaster`.`m_item`.`SeriesID` AS `SeriesID`,`pdyspvmaster`.`m_item`.`ItemCode` AS `ItemCode`,`pdyspvmaster`.`m_item`.`ItemName` AS `ItemName`,`pdyspvmaster`.`m_item`.`PrintName` AS `PrintName`,`pdyspvmaster`.`m_item`.`Packing` AS `Packing`,`pdyspvmaster`.`m_item`.`BaseUnit` AS `BaseUnit`,`pdyspvmaster`.`m_item`.`PurcUnit` AS `PurcUnit`,`pdyspvmaster`.`m_item`.`QtyPerPurcUnit` AS `QtyPerPurcUnit`,`pdyspvmaster`.`m_item`.`MktByID` AS `MktByID`,`pdyspvmaster`.`m_item`.`MktBy` AS `MktBy`,`pdyspvmaster`.`m_item`.`MfgByID` AS `MfgByID`,`pdyspvmaster`.`m_item`.`DivisionId` AS `DivisionId`,`pdyspvmaster`.`m_item`.`Division` AS `Division`,`pdyspvmaster`.`m_item`.`AllowInvDisc` AS `AllowInvDisc`,`pdyspvmaster`.`m_item`.`DiscPer` AS `DiscPer`,`pdyspvmaster`.`m_item`.`MinNetQty` AS `MinNetQty`,`pdyspvmaster`.`m_item`.`MultipleOfQty` AS `MultipleOfQty`,`pdyspvmaster`.`m_item`.`MinSaleQty` AS `MinSaleQty`,`pdyspvmaster`.`m_item`.`AllowSLRT` AS `AllowSLRT`,`pdyspvmaster`.`m_item`.`AllowChangePTR` AS `AllowChangePTR`,`pdyspvmaster`.`m_item`.`IncSS` AS `IncSS`,`pdyspvmaster`.`m_item`.`ItemCatgID` AS `ItemCatgID`,`pdyspvmaster`.`m_item`.`ItemCategory` AS `ItemCategory`,`pdyspvmaster`.`m_item`.`IsColdChain` AS `IsColdChain`,`pdyspvmaster`.`m_item`.`ItemGroup` AS `ItemGroup`,`pdyspvmaster`.`m_item`.`MISRate` AS `MISRate`,`pdyspvmaster`.`m_item`.`HSN` AS `HSN`,`pdyspvmaster`.`m_item`.`TaxGrpCode` AS `TaxGrpCode`,`pdyspvmaster`.`m_item`.`GeneralTaxP` AS `GeneralTaxP`,`pdyspvmaster`.`m_item`.`CompNo` AS `CompNo`,`pdyspvmaster`.`m_item`.`Initial` AS `Initial`,`pdyspvmaster`.`m_item`.`Notes` AS `Notes`,`pdyspvmaster`.`m_item`.`Remark` AS `Remark`,`pdyspvmaster`.`m_item`.`ItemUnder` AS `ItemUnder`,`pdyspvmaster`.`m_item`.`shortIname` AS `shortIname`,`pdyspvmaster`.`m_item`.`AllowSALE` AS `AllowSALE`,`pdyspvmaster`.`m_item`.`VendorRefICode` AS `VendorRefICode`,`pdyspvmaster`.`m_item`.`AllowBranchTrans` AS `AllowBranchTrans`,`pdyspvmaster`.`m_item`.`Block` AS `Block`,`pdyspvmaster`.`m_item`.`CNQty` AS `CNQty`,`pdyspvmaster`.`m_item`.`CNFree` AS `CNFree`,`pdyspvmaster`.`m_item`.`CreatedBy` AS `CreatedBy`,`pdyspvmaster`.`m_item`.`CreatedDate` AS `CreatedDate`,`pdyspvmaster`.`m_item`.`EditedBy` AS `EditedBy`,`pdyspvmaster`.`m_item`.`EditedDate` AS `EditedDate`,`pdyspvmaster`.`m_item`.`RowVersion` AS `RowVersion`,`pdyspvmaster`.`m_item`.`PriQty` AS `PriQty`,`pdyspvmaster`.`m_item`.`PriContains` AS `PriContains`,`pdyspvmaster`.`m_item`.`PriContainsUnit` AS `PriContainsUnit`,`pdyspvmaster`.`m_item`.`PerBoxPri` AS `PerBoxPri`,`pdyspvmaster`.`m_item`.`PerTerPri` AS `PerTerPri`,`pdyspvmaster`.`m_item`.`EffectInward` AS `EffectInward`,`pdyspvmaster`.`m_item`.`LBatchNo` AS `LBatchNo`,`pdyspvmaster`.`m_item`.`LPrate` AS `LPrate`,`pdyspvmaster`.`m_item`.`LPTR` AS `LPTR`,`pdyspvmaster`.`m_item`.`LMRP` AS `LMRP`,`pdyspvmaster`.`m_item`.`LExpDt` AS `LExpDt`,`pdyspvmaster`.`m_item`.`PTRMarginP` AS `PTRMarginP`,`pdyspvmaster`.`m_item`.`PRateMarginP` AS `PRateMarginP`,`pdyspvmaster`.`m_item`.`InActive` AS `InActive`,`pdyspvmaster`.`m_item`.`IsUpdated` AS `IsUpdated`,`pdyspvmaster`.`m_item`.`DropPTR` AS `DropPTR`,`pdyspvmaster`.`m_item`.`ItemMainCategory` AS `ItemMainCategory`,`pdyspvmaster`.`m_item`.`ItemSubCategory` AS `ItemSubCategory`,`pdyspvmaster`.`m_item`.`LMfgBy` AS `LMfgBy`,`pdyspvmaster`.`m_item`.`AllowExpiry` AS `AllowExpiry`,`pdyspvmaster`.`m_item`.`OldTaxGrpCode` AS `OldTaxGrpCode`,`pdyspvmaster`.`m_item`.`OldLMRP` AS `OldLMRP`,`pdyspvmaster`.`m_item`.`SchMinQty` AS `SchMinQty` from `pdyspvmaster`.`m_item`

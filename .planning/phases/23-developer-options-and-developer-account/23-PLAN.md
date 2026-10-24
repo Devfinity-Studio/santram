@@ -162,4 +162,4 @@ Implement an enterprise-grade Developer Control Center and full-fledged Develope
 3. Validate production Next.js build:
    - `pnpm run build` exits 0 with all routes and middleware compiling cleanly.
 4. Database Write Audit:
-   - Confirm 0 writes to `pdyasvmaster`. All developer controls, subscription metadata, and feature toggles reside in isolated local files and memory.
+   - Confirm 0 writes to `pdyspvmaster`. All developer controls, subscription metadata, and feature toggles reside in isolated local files and memory.

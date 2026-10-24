@@ -1,7 +1,7 @@
 # Phase 22 Summary: Audit & Security Hardening
 
 ## Overview
-Phase 22 implemented enterprise-grade security hardening, brute-force mitigation, IP allowlisting, HTTP security headers, request tracing, and an isolated structured audit logging engine with a dedicated Admin Audit Log viewer—while strictly adhering to 100% read-only integrity for the legacy ERP database (`pdyasvmaster`).
+Phase 22 implemented enterprise-grade security hardening, brute-force mitigation, IP allowlisting, HTTP security headers, request tracing, and an isolated structured audit logging engine with a dedicated Admin Audit Log viewer—while strictly adhering to 100% read-only integrity for the legacy ERP database (`pdyspvmaster`).
 
 ---
 
@@ -68,4 +68,4 @@ Zero-write memory-based sliding token bucket store with automatic 60-second prun
 3. **Production Next.js Build**:
    - `pnpm run build` exits 0 with all 14 routes generated, middleware compiled (`34.5 kB`), and new `/admin/audit` route generated (`3.88 kB`).
 4. **Database Write Audit**:
-   - Confirmed 0 writes to the legacy ERP MySQL database (`pdyasvmaster`). All rate limiting and audit state resides in isolated memory and local files.
+   - Confirmed 0 writes to the legacy ERP MySQL database (`pdyspvmaster`). All rate limiting and audit state resides in isolated memory and local files.

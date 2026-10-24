@@ -1,75 +1,75 @@
 # Phase 9: Legacy MySQL MR User Integration Plan
 
 ## Goal
-Transition all Medical Representative (MR) identity, profile, and authorization metadata lookups from the Neon PostgreSQL `user` table to the client's legacy MySQL database schema (`pdyasvmaster.m_user`).
+Transition all Medical Representative (MR) identity, profile, and authorization metadata lookups from the Neon PostgreSQL `user` table to the client's legacy MySQL database schema (`pdyspvmaster.m_user`).
 
 ---
 
 ## 1. Overview & Architecture
 
-### Legacy Schema: `pdyasvmaster.m_user`
-The legacy MySQL database is accessed via `legacyDb` (`mysql2/promise`) using credentials configured in `.env` (`CLIENT_MYSQL_*` pointing to `pdyasvmaster` and `pdyasvtrans`).
+### Legacy Schema: `pdyspvmaster.m_user`
+The legacy MySQL database is accessed via `legacyDb` (`mysql2/promise`) using credentials configured in `.env` (`CLIENT_MYSQL_*` pointing to `pdyspvmaster` and `pdyspvtrans`).
 
 The explicit SQL schema specified by the client:
 ```sql
 SELECT 
-    `pdyasvmaster`.`m_user`.`ID` AS `ID`,
-    `pdyasvmaster`.`m_user`.`UCode` AS `UCode`,
-    `pdyasvmaster`.`m_user`.`Description` AS `Description`,
-    `pdyasvmaster`.`m_user`.`Password` AS `Password`,
-    `pdyasvmaster`.`m_user`.`JobProfile` AS `JobProfile`,
-    `pdyasvmaster`.`m_user`.`Education` AS `Education`,
-    `pdyasvmaster`.`m_user`.`Address1` AS `Address1`,
-    `pdyasvmaster`.`m_user`.`Address2` AS `Address2`,
-    `pdyasvmaster`.`m_user`.`Address3` AS `Address3`,
-    `pdyasvmaster`.`m_user`.`City` AS `City`,
-    `pdyasvmaster`.`m_user`.`Area` AS `Area`,
-    `pdyasvmaster`.`m_user`.`ContactNoR` AS `ContactNoR`,
-    `pdyasvmaster`.`m_user`.`MobileNo` AS `MobileNo`,
-    `pdyasvmaster`.`m_user`.`EmailId` AS `EmailId`,
-    `pdyasvmaster`.`m_user`.`DOB` AS `DOB`,
-    `pdyasvmaster`.`m_user`.`DOA` AS `DOA`,
-    `pdyasvmaster`.`m_user`.`DOJ` AS `DOJ`,
-    `pdyasvmaster`.`m_user`.`DOR` AS `DOR`,
-    `pdyasvmaster`.`m_user`.`Gender` AS `Gender`,
-    `pdyasvmaster`.`m_user`.`BloodGroup` AS `BloodGroup`,
-    `pdyasvmaster`.`m_user`.`RefrenceBy` AS `RefrenceBy`,
-    `pdyasvmaster`.`m_user`.`RefrenceContact` AS `RefrenceContact`,
-    `pdyasvmaster`.`m_user`.`Guardian` AS `Guardian`,
-    `pdyasvmaster`.`m_user`.`GuardianContact` AS `GuardianContact`,
-    `pdyasvmaster`.`m_user`.`ValidityDays` AS `ValidityDays`,
-    `pdyasvmaster`.`m_user`.`PasswordExpDt` AS `PasswordExpDt`,
-    `pdyasvmaster`.`m_user`.`Notes` AS `Notes`,
-    `pdyasvmaster`.`m_user`.`IsSalesMan` AS `IsSalesMan`,
-    `pdyasvmaster`.`m_user`.`IsDeliveryman` AS `IsDeliveryman`,
-    `pdyasvmaster`.`m_user`.`IsBlocked` AS `IsBlocked`,
-    `pdyasvmaster`.`m_user`.`IsSaleUser` AS `IsSaleUser`,
-    `pdyasvmaster`.`m_user`.`RestrictComNo` AS `RestrictComNo`,
-    `pdyasvmaster`.`m_user`.`RestrictLocNo` AS `RestrictLocNo`,
-    `pdyasvmaster`.`m_user`.`RestrictYearNo` AS `RestrictYearNo`,
-    `pdyasvmaster`.`m_user`.`UserImg` AS `UserImg`,
-    `pdyasvmaster`.`m_user`.`xCode` AS `xCode`,
-    `pdyasvmaster`.`m_user`.`WorkingDate` AS `WorkingDate`,
-    `pdyasvmaster`.`m_user`.`LogCmpNo` AS `LogCmpNo`,
-    `pdyasvmaster`.`m_user`.`LogLocNo` AS `LogLocNo`,
-    `pdyasvmaster`.`m_user`.`LogYearNo` AS `LogYearNo`,
-    `pdyasvmaster`.`m_user`.`LogStatus` AS `LogStatus`,
-    `pdyasvmaster`.`m_user`.`WorkingAddress` AS `WorkingAddress`,
-    `pdyasvmaster`.`m_user`.`LogInDateTime` AS `LogInDateTime`,
-    `pdyasvmaster`.`m_user`.`WorkingDateTime` AS `WorkingDateTime`,
-    `pdyasvmaster`.`m_user`.`CreatedBy` AS `CreatedBy`,
-    `pdyasvmaster`.`m_user`.`CreatedDate` AS `CreatedDate`,
-    `pdyasvmaster`.`m_user`.`EditedBy` AS `EditedBy`,
-    `pdyasvmaster`.`m_user`.`EditedDate` AS `EditedDate`,
-    `pdyasvmaster`.`m_user`.`RowVersion` AS `RowVersion`,
-    `pdyasvmaster`.`m_user`.`UserGroup` AS `UserGroup`,
-    `pdyasvmaster`.`m_user`.`showMargin` AS `showMargin`,
-    `pdyasvmaster`.`m_user`.`Chalprinter` AS `Chalprinter`,
-    `pdyasvmaster`.`m_user`.`SalePrinter` AS `SalePrinter`,
-    `pdyasvmaster`.`m_user`.`SaleRestrictedICS` AS `SaleRestrictedICS`,
-    `pdyasvmaster`.`m_user`.`StageID` AS `StageID`,
-    `pdyasvmaster`.`m_user`.`PrintInvoice` AS `PrintInvoice`
-FROM `pdyasvmaster`.`m_user`
+    `pdyspvmaster`.`m_user`.`ID` AS `ID`,
+    `pdyspvmaster`.`m_user`.`UCode` AS `UCode`,
+    `pdyspvmaster`.`m_user`.`Description` AS `Description`,
+    `pdyspvmaster`.`m_user`.`Password` AS `Password`,
+    `pdyspvmaster`.`m_user`.`JobProfile` AS `JobProfile`,
+    `pdyspvmaster`.`m_user`.`Education` AS `Education`,
+    `pdyspvmaster`.`m_user`.`Address1` AS `Address1`,
+    `pdyspvmaster`.`m_user`.`Address2` AS `Address2`,
+    `pdyspvmaster`.`m_user`.`Address3` AS `Address3`,
+    `pdyspvmaster`.`m_user`.`City` AS `City`,
+    `pdyspvmaster`.`m_user`.`Area` AS `Area`,
+    `pdyspvmaster`.`m_user`.`ContactNoR` AS `ContactNoR`,
+    `pdyspvmaster`.`m_user`.`MobileNo` AS `MobileNo`,
+    `pdyspvmaster`.`m_user`.`EmailId` AS `EmailId`,
+    `pdyspvmaster`.`m_user`.`DOB` AS `DOB`,
+    `pdyspvmaster`.`m_user`.`DOA` AS `DOA`,
+    `pdyspvmaster`.`m_user`.`DOJ` AS `DOJ`,
+    `pdyspvmaster`.`m_user`.`DOR` AS `DOR`,
+    `pdyspvmaster`.`m_user`.`Gender` AS `Gender`,
+    `pdyspvmaster`.`m_user`.`BloodGroup` AS `BloodGroup`,
+    `pdyspvmaster`.`m_user`.`RefrenceBy` AS `RefrenceBy`,
+    `pdyspvmaster`.`m_user`.`RefrenceContact` AS `RefrenceContact`,
+    `pdyspvmaster`.`m_user`.`Guardian` AS `Guardian`,
+    `pdyspvmaster`.`m_user`.`GuardianContact` AS `GuardianContact`,
+    `pdyspvmaster`.`m_user`.`ValidityDays` AS `ValidityDays`,
+    `pdyspvmaster`.`m_user`.`PasswordExpDt` AS `PasswordExpDt`,
+    `pdyspvmaster`.`m_user`.`Notes` AS `Notes`,
+    `pdyspvmaster`.`m_user`.`IsSalesMan` AS `IsSalesMan`,
+    `pdyspvmaster`.`m_user`.`IsDeliveryman` AS `IsDeliveryman`,
+    `pdyspvmaster`.`m_user`.`IsBlocked` AS `IsBlocked`,
+    `pdyspvmaster`.`m_user`.`IsSaleUser` AS `IsSaleUser`,
+    `pdyspvmaster`.`m_user`.`RestrictComNo` AS `RestrictComNo`,
+    `pdyspvmaster`.`m_user`.`RestrictLocNo` AS `RestrictLocNo`,
+    `pdyspvmaster`.`m_user`.`RestrictYearNo` AS `RestrictYearNo`,
+    `pdyspvmaster`.`m_user`.`UserImg` AS `UserImg`,
+    `pdyspvmaster`.`m_user`.`xCode` AS `xCode`,
+    `pdyspvmaster`.`m_user`.`WorkingDate` AS `WorkingDate`,
+    `pdyspvmaster`.`m_user`.`LogCmpNo` AS `LogCmpNo`,
+    `pdyspvmaster`.`m_user`.`LogLocNo` AS `LogLocNo`,
+    `pdyspvmaster`.`m_user`.`LogYearNo` AS `LogYearNo`,
+    `pdyspvmaster`.`m_user`.`LogStatus` AS `LogStatus`,
+    `pdyspvmaster`.`m_user`.`WorkingAddress` AS `WorkingAddress`,
+    `pdyspvmaster`.`m_user`.`LogInDateTime` AS `LogInDateTime`,
+    `pdyspvmaster`.`m_user`.`WorkingDateTime` AS `WorkingDateTime`,
+    `pdyspvmaster`.`m_user`.`CreatedBy` AS `CreatedBy`,
+    `pdyspvmaster`.`m_user`.`CreatedDate` AS `CreatedDate`,
+    `pdyspvmaster`.`m_user`.`EditedBy` AS `EditedBy`,
+    `pdyspvmaster`.`m_user`.`EditedDate` AS `EditedDate`,
+    `pdyspvmaster`.`m_user`.`RowVersion` AS `RowVersion`,
+    `pdyspvmaster`.`m_user`.`UserGroup` AS `UserGroup`,
+    `pdyspvmaster`.`m_user`.`showMargin` AS `showMargin`,
+    `pdyspvmaster`.`m_user`.`Chalprinter` AS `Chalprinter`,
+    `pdyspvmaster`.`m_user`.`SalePrinter` AS `SalePrinter`,
+    `pdyspvmaster`.`m_user`.`SaleRestrictedICS` AS `SaleRestrictedICS`,
+    `pdyspvmaster`.`m_user`.`StageID` AS `StageID`,
+    `pdyspvmaster`.`m_user`.`PrintInvoice` AS `PrintInvoice`
+FROM `pdyspvmaster`.`m_user`
 ```
 
 ---
@@ -78,7 +78,7 @@ FROM `pdyasvmaster`.`m_user`
 
 ### Task 1: Finalize Centralized Action `src/server/actions/mrInfo.ts`
 - Expose `getMRInfo(identifier)` to fetch a single user by ID, UCode, Description, or Email.
-- Expose `getAllMRUsers()` to return all legacy users from `pdyasvmaster.m_user`.
+- Expose `getAllMRUsers()` to return all legacy users from `pdyspvmaster.m_user`.
 - Ensure robust fallbacks for Postgres session mappings while the system transitions to MySQL primary keys.
 
 ### Task 2: Update Server Components & Dashboards
@@ -101,7 +101,7 @@ Update all download handlers to call `getMRInfo(mrId)`:
 4. `src/app/api/reports/download-outstanding/route.ts`
 
 ### Task 4: Update Admin MR Management Views
-- In `src/app/admin/mrs/page.tsx`, integrate `getAllMRUsers()` so administrators can see and manage representatives directly from `pdyasvmaster.m_user`.
+- In `src/app/admin/mrs/page.tsx`, integrate `getAllMRUsers()` so administrators can see and manage representatives directly from `pdyspvmaster.m_user`.
 
 ### Task 5: Build & Type-Check Verification
 - Execute `pnpm run build` to verify clean compilation with zero type errors.

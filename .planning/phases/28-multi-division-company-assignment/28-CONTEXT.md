@@ -1,7 +1,7 @@
 # Phase 28: Multi-Division MR Database Scanning & Aggregation - Context & Requirements
 
 ## Objectives
-Equip PharmaQL with automated **Multi-Division Database Scanning and Aggregation** for Medical Representatives (MRs). The ERP database (`pdyasvmaster.l_mktcompany_mr`) has been updated to contain multiple rows for the same MR (sharing the same `MRName` and/or `EmailId`, but having different `ID` and `DivisionID` values linking to different divisions in `l_mktcompany` and marketing companies in `m_mktcompany`).
+Equip PharmaQL with automated **Multi-Division Database Scanning and Aggregation** for Medical Representatives (MRs). The ERP database (`pdyspvmaster.l_mktcompany_mr`) has been updated to contain multiple rows for the same MR (sharing the same `MRName` and/or `EmailId`, but having different `ID` and `DivisionID` values linking to different divisions in `l_mktcompany` and marketing companies in `m_mktcompany`).
 
 Previously, queries in `auth.ts`, `master.ts`, and `mrInfo.ts` executed with `LIMIT 1` or treated each row in isolation, causing MRs to see only their first division and hiding all other assigned divisions. Furthermore, MR impersonation in the Developer Control Center (`/admin/dev`) did not consolidate these entries or allow full search by company name.
 
@@ -13,7 +13,7 @@ This phase implements automated scanning across all duplicate MR records in the 
 
 ### 1. Database Scanning & Entity Consolidation (Zero Manual Input Needed)
 - **Automatic Matching Criteria**:
-  - Two or more records in `pdyasvmaster.l_mktcompany_mr` represent the same MR if:
+  - Two or more records in `pdyspvmaster.l_mktcompany_mr` represent the same MR if:
     1. They share the same `MRName` (case-insensitive, trimmed), OR
     2. They share the same non-placeholder `EmailId` (case-insensitive, trimmed, excluding `@Santrampharma.com` synthetic emails).
 - **Aggregated Profile**:

@@ -1,7 +1,7 @@
 # Phase 28: Multi-Division MR Database Scanning & Aggregation Plan
 
 ## Objective
-Automatically scan, aggregate, and display all division and company records for MRs in PharmaQL. The database (`pdyasvmaster.l_mktcompany_mr`) stores multiple entries for MRs with the same name and email across different `DivisionID`s. This plan consolidates those database records into unified MR profiles, enables company-name search in MR Impersonation and Admin lists, and provides a multi-division switcher on the MR dashboard.
+Automatically scan, aggregate, and display all division and company records for MRs in PharmaQL. The database (`pdyspvmaster.l_mktcompany_mr`) stores multiple entries for MRs with the same name and email across different `DivisionID`s. This plan consolidates those database records into unified MR profiles, enables company-name search in MR Impersonation and Admin lists, and provides a multi-division switcher on the MR dashboard.
 
 ---
 
@@ -9,7 +9,7 @@ Automatically scan, aggregate, and display all division and company records for 
 
 ```mermaid
 flowchart TD
-    subgraph Database ["ERP MySQL (pdyasvmaster)"]
+    subgraph Database ["ERP MySQL (pdyspvmaster)"]
         MRRows["l_mktcompany_mr Rows<br/>(Multiple rows with same MRName / EmailId, different DivisionID)"]
         Divisions["l_mktcompany (Divisions)"]
         Companies["m_mktcompany (Marketing Companies)"]

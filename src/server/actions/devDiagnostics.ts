@@ -309,15 +309,15 @@ function buildFallbackProcedureSql(procedureName: string, params: Record<string,
 	const escapedLoc = `'${locParam.replace(/'/g, "''")}'`;
 
 	if (procedureName === "rptStockMovementStatement") {
-		return `SET sql_mode = '';\nCALL \`pdyasvtrans\`.\`rptStockMovementStatement\`(${params.compNo ?? 11}, ${escapedLoc}, 202627, {d '2026-04-01'}, ${odbcFrom}, ${odbcTo}, ${compParam}, '', '', 'PRate');`;
+		return `SET sql_mode = '';\nCALL \`pdyspvtrans\`.\`rptStockMovementStatement\`(${params.compNo ?? 11}, ${escapedLoc}, 202627, {d '2026-04-01'}, ${odbcFrom}, ${odbcTo}, ${compParam}, '', '', 'PRate');`;
 	} else if (procedureName === "rptStockandSalesStatementReport") {
-		return `SET sql_mode = '';\nCALL \`pdyasvtrans\`.\`rptStockandSalesStatementReport\`(${params.compNo ?? 11}, ${escapedLoc}, ${odbcFrom}, ${odbcTo}, ${compParam}, '', '', '', 'N', 'Y');`;
+		return `SET sql_mode = '';\nCALL \`pdyspvtrans\`.\`rptStockandSalesStatementReport\`(${params.compNo ?? 11}, ${escapedLoc}, ${odbcFrom}, ${odbcTo}, ${compParam}, '', '', '', 'N', 'Y');`;
 	} else if (procedureName === "rptItemCustomerSale") {
-		return `SET sql_mode = '';\nCALL \`pdyasvtrans\`.\`rptItemCustomerSale\`(${odbcFrom}, ${odbcTo}, ${params.compNo ?? 11}, ${escapedLoc}, 202627, '', '', '', ${compParam}, '', 'Y', '', '', ${escapedLoc}, 'SalesEntry', '');`;
+		return `SET sql_mode = '';\nCALL \`pdyspvtrans\`.\`rptItemCustomerSale\`(${odbcFrom}, ${odbcTo}, ${params.compNo ?? 11}, ${escapedLoc}, 202627, '', '', '', ${compParam}, '', 'Y', '', '', ${escapedLoc}, 'SalesEntry', '');`;
 	} else if (procedureName === "rptMRwisePeriodicalOutstanding") {
-		return `SET sql_mode = '';\nCALL \`pdyasvtrans\`.\`rptMRwisePeriodicalOutstanding\`(${params.compNo ?? 11}, ${Number(params.locNo) || 11}, 202627, {d '2026-04-01'}, ${odbcFrom}, ${odbcTo}, '', '', 'All', '', '', ${compParam}, '', '', '');`;
+		return `SET sql_mode = '';\nCALL \`pdyspvtrans\`.\`rptMRwisePeriodicalOutstanding\`(${params.compNo ?? 11}, ${Number(params.locNo) || 11}, 202627, {d '2026-04-01'}, ${odbcFrom}, ${odbcTo}, '', '', 'All', '', '', ${compParam}, '', '', '');`;
 	} else if (procedureName === "rptCompanyCustomerItemwiseSales") {
-		return `SET sql_mode = '';\nCALL \`pdyasvtrans\`.\`rptCompanyCustomerItemwiseSales\`(${params.compNo ?? 11}, ${escapedLoc}, 202627, ${odbcFrom}, ${odbcTo}, '', ${compParam}, '', '', 'Y', '');`;
+		return `SET sql_mode = '';\nCALL \`pdyspvtrans\`.\`rptCompanyCustomerItemwiseSales\`(${params.compNo ?? 11}, ${escapedLoc}, 202627, ${odbcFrom}, ${odbcTo}, '', ${compParam}, '', '', 'Y', '');`;
 	}
 	return `SET sql_mode = '';\nCALL \`${procedureName}\`(...);`;
 }

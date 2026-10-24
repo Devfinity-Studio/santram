@@ -13,13 +13,13 @@
  ┌───────────────────────────┐         ┌─────────────────────────┐
  │ Next.js Server            │  READ   │ Legacy MySQL ERP        │
  │                           │────────▶│                         │
- │ 1. Auth:                  │         │ • pdyasvmaster:         │
+ │ 1. Auth:                  │         │ • pdyspvmaster:         │
  │    • MRs: Email OTP (via  │         │   - l_mktcompany_mr     │
  │      Gmail SMTP in .env)  │         │   - l_mktcompany        │
  │    • Admin/Dev: .env pass │         │   - m_mktcompany        │
  │    • Cookies: Signed JWT  │         │   - m_item              │
  │                           │         │                         │
- │ 2. Notices:               │         │ • pdyasvtrans:          │
+ │ 2. Notices:               │         │ • pdyspvtrans:          │
  │    • data/notices.json    │         │   - 5 Stored Procedures │
  │                           │         │                         │
  │ 3. 0 Database Tables!     │         │                         │
@@ -38,13 +38,13 @@
   - `src/server/actions/authActions.ts` (New: MR email OTP request/verify + Admin/Developer email+password login)
   - `src/app/login/page.tsx` (Update: UI tabs for "MR Email OTP Login" and "Admin / Developer Login")
 - **Details:**
-  - MR enters Email. Server looks up MR in `pdyasvmaster.l_mktcompany_mr`. If valid, generates a 6-digit OTP, sends it via Gmail SMTP (`GMAIL_USER` / `GMAIL_PASS`), and sets an encrypted HTTP-only JWT session cookie upon verification.
+  - MR enters Email. Server looks up MR in `pdyspvmaster.l_mktcompany_mr`. If valid, generates a 6-digit OTP, sends it via Gmail SMTP (`GMAIL_USER` / `GMAIL_PASS`), and sets an encrypted HTTP-only JWT session cookie upon verification.
   - Admin/Developer enters email and password, validated against `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `DEV_EMAIL`, `DEV_PASSWORD` in `.env`.
   - Zero database tables created or queried for session management.
 
 ### Plan 11.2: Native MySQL Products Catalog Service
 - **Files:**
-  - `src/server/actions/itemCatalog.ts` (New: queries `pdyasvmaster.m_item` with the exact verified SQL projection)
+  - `src/server/actions/itemCatalog.ts` (New: queries `pdyspvmaster.m_item` with the exact verified SQL projection)
   - `src/app/api/products/route.ts` (Update: replace Postgres query with `itemCatalog.ts`)
   - `src/app/products/[company]/page.tsx` (Update: replace Postgres query with `itemCatalog.ts`)
 - **Details:**
@@ -78,7 +78,7 @@
 - [ ] MR login works via Email OTP sent using Gmail SMTP (`GMAIL_USER` / `GMAIL_PASS`) without touching any session database table.
 - [ ] Admin & Developer accounts log in via email & password specified in `.env`.
 - [ ] All 5 reports continue functioning normally with zero regressions.
-- [ ] Product listings render directly from `pdyasvmaster.m_item`.
+- [ ] Product listings render directly from `pdyspvmaster.m_item`.
 - [ ] Notices read and write cleanly to `data/notices.json`.
 - [ ] `DATABASE_URL` is commented out in `.env` and optional in `src/env.js`.
 - [ ] Neon Postgres is 100% removed.

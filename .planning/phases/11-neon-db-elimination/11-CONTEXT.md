@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-11  
 **Status:** Ready for Execution  
-**Goal:** Completely eliminate the Neon Postgres database while strictly respecting the architectural constraint: **Zero new tables created in MySQL** (`pdyasvmaster` and `pdyasvtrans`).
+**Goal:** Completely eliminate the Neon Postgres database while strictly respecting the architectural constraint: **Zero new tables created in MySQL** (`pdyspvmaster` and `pdyspvtrans`).
 
 ---
 
@@ -11,7 +11,7 @@
 1. **Authentication:**
    - **MR Users:** Authenticate exclusively via **OTP sent to Email** (NOT mobile).
      - MR enters their Email ID (or user identifier).
-     - Look up MR in `pdyasvmaster.l_mktcompany_mr`.
+     - Look up MR in `pdyspvmaster.l_mktcompany_mr`.
      - Generate a secure 6-digit OTP and send it via the configured **Gmail SMTP server** (`GMAIL_USER` and `GMAIL_PASS` in `.env`).
      - On OTP verification, issue an encrypted stateless JWT session cookie.
    - **Admin & Developer Accounts:**
@@ -22,11 +22,11 @@
      - Zero database records stored or queried for active sessions.
 
 2. **MR & Manufacturer Division Mapping:**
-   - Single source of truth is `pdyasvmaster.l_mktcompany_mr` joined with `pdyasvmaster.l_mktcompany` and `pdyasvmaster.m_mktcompany`.
+   - Single source of truth is `pdyspvmaster.l_mktcompany_mr` joined with `pdyspvmaster.l_mktcompany` and `pdyspvmaster.m_mktcompany`.
    - `mrManufacturers` Postgres table is completely removed.
 
 3. **Product Catalog:**
-   - Read directly from `pdyasvmaster.m_item` using the exact user-specified projection:
+   - Read directly from `pdyspvmaster.m_item` using the exact user-specified projection:
      ```sql
      SELECT 
        ID, AWACSCode, SeriesID, ItemCode, ItemName, PrintName, Packing,
@@ -36,7 +36,7 @@
        IsColdChain, ItemGroup, MISRate, HSN, TaxGrpCode, GeneralTaxP, CompNo,
        PriQty, PriContains, PriContainsUnit, LBatchNo, LPrate, LPTR, LMRP,
        LExpDt, PTRMarginP, PRateMarginP, InActive
-     FROM pdyasvmaster.m_item
+     FROM pdyspvmaster.m_item
      ```
 
 4. **Notices / Announcements:**

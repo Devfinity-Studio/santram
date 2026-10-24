@@ -11,8 +11,8 @@
 PharmaQL does not connect directly from Next.js serverless functions to the MySQL database; instead, it interfaces through a dedicated API Gateway microservice (`api-server`).
 
 - **Databases Accessed:**
-  - `pdyasvtrans`: Transactional database containing live sales, stock movements, and party outstandings.
-  - `pdyasvmaster`: Master database containing MR listings (`l_mktcompany_mr`), division links (`l_mktcompany`), and company profiles (`m_mktcompany`).
+  - `pdyspvtrans`: Transactional database containing live sales, stock movements, and party outstandings.
+  - `pdyspvmaster`: Master database containing MR listings (`l_mktcompany_mr`), division links (`l_mktcompany`), and company profiles (`m_mktcompany`).
 - **Connection Configuration:**
   - Configured in `api-server/.env` using `mysql2/promise` with connection pooling (up to 25 connections, 10 max idle, 60s idle timeout, keep-alive active).
 - **Primary Stored Procedures Invoked:**
@@ -108,6 +108,6 @@ The Next.js application acts as a Backend-For-Frontend (BFF), communicating with
 | `CLIENT_MYSQL_PORT` | No | `2903` | Port of the MySQL service |
 | `CLIENT_MYSQL_USER` | Yes | `pharmaql` | Database user with permissions to execute stored procedures |
 | `CLIENT_MYSQL_PASSWORD`| Yes | - | Database user password |
-| `CLIENT_MYSQL_DATABASE`| No | `pdyasvtrans` | Default database schema |
+| `CLIENT_MYSQL_DATABASE`| No | `pdyspvtrans` | Default database schema |
 | `API_SECRET_KEY` | Yes | - | Shared secret Bearer token to authorize incoming requests |
 | `ALLOWED_ORIGINS` | No | `http://localhost:3000` | Comma-separated list of allowed CORS origins |

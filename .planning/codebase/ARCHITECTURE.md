@@ -27,8 +27,8 @@ PharmaQL operates on a **decoupled, multi-tier enterprise architecture** designe
          │  (mysql2 Connection Pool)
          ▼
 [ On-Premises Legacy MySQL ERP ]
-   ├── pdyasvtrans (Transactional: Sales, Stock, Outstandings)
-   └── pdyasvmaster (Master: MRs, Divisions, Companies)
+   ├── pdyspvtrans (Transactional: Sales, Stock, Outstandings)
+   └── pdyspvmaster (Master: MRs, Divisions, Companies)
 ```
 
 ---

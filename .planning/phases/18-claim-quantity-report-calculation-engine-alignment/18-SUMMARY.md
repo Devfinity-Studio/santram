@@ -8,7 +8,7 @@ Phase 18 aligned the Claim Quantity / Free Scheme report calculation engine, bac
 1. **Backend Query Hardening (`api-server/src/routes/reports.ts`)**:
    - Refactored `/claim-data` endpoint:
      - Implemented dynamic session UUID generation (`claim-${Date.now()}-${random}`) to prevent temporary table and static GUID collisions across concurrent users.
-     - Enforced pre-query cleanup: `DELETE FROM pdyasvtrans.claimdata WHERE UniqueCode = ?` before procedure execution.
+     - Enforced pre-query cleanup: `DELETE FROM pdyspvtrans.claimdata WHERE UniqueCode = ?` before procedure execution.
      - Added post-retrieval cleanup to automatically purge temporary session records from `claimdata` table, keeping the ERP database clean and lean.
    - Built with 0 TypeScript compilation errors (`npm run build`).
 
